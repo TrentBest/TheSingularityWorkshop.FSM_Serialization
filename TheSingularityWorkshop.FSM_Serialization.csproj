@@ -1,9 +1,30 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+
+    <PackageId>TheSingularityWorkshop.FSM_Serialization</PackageId>
+    <Version>0.1.0-alpha.1</Version>
+    <Authors>Trent Best</Authors>
+    <Company>The Singularity Workshop</Company>
+    <Description>Deterministic serialization infrastructure for FSM ecosystem state, MicroBundle composition, Experience manifests, and lineage.</Description>
+    <PackageTags>FSM;FSM_COS;MicroBundle;Experience;serialization;digital-reality</PackageTags>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/TrentBest/TheSingularityWorkshop.FSM_Serialization</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/TrentBest/TheSingularityWorkshop.FSM_Serialization</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="README.md" Pack="true" PackagePath="" />
+    <None Include="LICENSE.txt" Pack="true" PackagePath="" />
+  </ItemGroup>
 
 </Project>
