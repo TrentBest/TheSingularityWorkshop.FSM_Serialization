@@ -1,93 +1,199 @@
 # TheSingularityWorkshop.FSM_Serialization
 
-**Deterministic representation for FSM ecosystem state and composition.**
+**Deterministic binary representation for the FSM ecosystem.**
 
-FSM_Serialization defines the boundary between the in-memory semantic model and representations that can be persisted, transported, cached, versioned, compared, or reconstructed.
+FSM_Serialization defines the boundary between an in-memory semantic model and a byte representation that can be persisted, transported, cached, versioned, compared, or reconstructed.
 
-## Why serialization exists
+The package is deliberately small: it provides the binary stream and pack/unpack contracts without becoming the semantic owner of the data.
 
-The FSM ecosystem needs a representation that can survive process boundaries, application restarts, network transport, storage backends, package and Experience versions, and sharing between users.
+## The boundary
 
-Serialization provides that representation without becoming the semantic owner of the data.
+Serialization is a representation boundary, not a second domain model.
+
+~~~text
+Semantic Model
+      |
+      v
+FSM_Serialization
+      |
+      v
+Binary Representation
+      |
+      v
+FSM_Serialization
+      |
+      v
+Semantic Model
+~~~
+
+The central contract is explicit:
+
+~~~text
+IBinaryPackable
+    Pack(IBinaryStream)
+
+IBinaryUnpackable
+    Unpack(IBinaryStream)
+
+IBinarySerializable
+    = IBinaryPackable + IBinaryUnpackable
+~~~
+
+A type owns the meaning of its state. FSM_Serialization only provides the byte-oriented boundary through which that state can be represented and reconstructed.
+
+## Binary first
+
+The original binary IO implementation was proven inside the WebPage/Workshop proving ground before being extracted into this package.
+
+The reusable foundation consists of:
+
+- IBinaryStream — the platform-neutral byte stream contract;
+- IBinaryPackable — writes an object's representation;
+- IBinaryUnpackable — reconstructs an object's state;
+- IBinarySerializable — combines packing and unpacking;
+- MemoryBinaryStream — in-memory stream implementation for buffering and tests;
+- StreamBinaryStream — adapter over a standard .NET Stream.
+
+This package does not introduce a competing JSON serializer or force a particular wire format.
 
 ## What belongs here
 
-The package is intended to provide neutral serialization infrastructure for:
+FSM_Serialization provides neutral representation infrastructure for:
 
+- binary state and composition data;
 - MicroBundle descriptors;
-- bundle composition;
-- dependency declarations;
 - Experience manifests;
-- runtime configuration;
+- dependency declarations;
 - identity and version metadata;
 - lineage metadata;
-- deterministic representations suitable for persistence and transport.
+- runtime configuration;
+- persistence and transport representations.
+
+The domain package that owns a type remains responsible for deciding what its fields mean and how those fields are packed.
 
 ## What does not belong here
 
-Serialization is not a domain database or domain interpreter.
+Serialization is not a domain database, interpreter, or application framework.
 
-It should not contain atomic-element semantics, game rules, AEC rules, GUI definitions, WebPage-specific models, domain physics, or assumptions about a particular MicroBundle family.
+It should not contain:
 
-The data is represented here; its meaning remains with the package that owns it.
+- FSM domain rules;
+- game rules;
+- AEC rules;
+- GUI definitions;
+- WebPage-specific models;
+- domain physics;
+- MicroBundle-family-specific semantics;
+- storage policy;
+- filesystem policy.
 
-## Core theory
+A physical filesystem can consume IBinaryStream, but filesystem ownership belongs to the host/storage layer rather than the serialization contract.
 
-A serialized Experience is not a second implementation of an Experience. It is a representation from which the runtime can reconstruct the same semantic composition.
+## Deterministic representation
+
+Where a domain contract defines an ordering, the implementation should make that ordering explicit rather than relying on incidental collection or runtime ordering.
+
+Deterministic binary representations are useful for:
+
+- reproducible persistence;
+- content identity;
+- caching;
+- synchronization;
+- version comparison;
+- debugging;
+- lineage records.
+
+Determinism is therefore a property of the representation contract and the type implementing it, not a hidden promise that every arbitrary object graph will serialize identically.
+
+## Round-tripping
+
+The fundamental invariant is semantic round-tripping:
 
 ~~~text
-Semantic Model
-      |
-      v
-Serialization
-      |
-      v
-Persistent / Transport Representation
-      |
-      v
-Deserialization
-      |
-      v
-Semantic Model
+A
+  |
+  | Pack
+  v
+bytes
+  |
+  | Unpack
+  v
+A'
 ~~~
 
-The goal is semantic round-tripping:
+A' need not be the same object instance. It must preserve the information required by the owning semantic contract.
+
+The test suite proves this at the binary contract level before higher-level FSM objects are introduced.
+
+## WebPage relationship
+
+WebPage was the proving ground for this serialization boundary.
+
+The extraction direction is intentional:
 
 ~~~text
-A -> serialize -> representation -> deserialize -> A'
+WebPage / Workshop
+        |
+        | proved binary IO
+        v
+FSM_Serialization
+        |
+        | reusable package
+        v
+WebPage / Workshop
 ~~~
 
-where A' preserves the information required by the runtime contract.
+WebPage should consume the package rather than continue owning a parallel copy of the binary serialization contracts.
 
-## Determinism
+That keeps serialization reusable by server, desktop, Unity, Forge, and other compatible hosts.
 
-Where practical, equivalent semantic inputs should produce equivalent serialized output.
+## Architecture
 
-Deterministic serialization matters for content identity, caching, version comparison, debugging, reproducible builds, lineage records, and synchronization.
+The broader FSM ecosystem separates responsibilities:
 
-Ordering and canonical representation should therefore be explicit rather than accidental.
+~~~text
+FSM_API
+  |
+FSM_COS / MicroBundle composition
+  |
+FSM_Serialization ---- representation boundary
+  |
+FSM_Memory ---------- persistence/cache
+  |
+FSM_REST ------------ transport
+  |
+WebPage / AnyApp ----- manifestation
+~~~
 
-## Lineage
+The package knows how to cross the representation boundary. It does not decide what an Experience means.
 
-Experiences can be derived from existing Experiences.
+## Current implementation status
 
-Serialization must preserve structural ancestry so the ecosystem can identify the source composition, source version, contributors, and ancestry of a published Experience.
+The first implementation is intentionally small and binary-first.
 
-Lineage is metadata about composition history. It is not a string appended to an author field.
+The package currently provides:
+
+1. binary stream abstraction;
+2. pack/unpack contracts;
+3. combined binary serialization contract;
+4. memory and standard-stream adapters;
+5. unit tests for round-tripping, piping, delegation, and incomplete input.
+
+Higher-level canonical manifest formats can be added later without replacing these primitive contracts.
 
 ## Packaging
 
-This repository produces a reusable NuGet package:
+NuGet package:
 
 ~~~text
 TheSingularityWorkshop.FSM_Serialization
 ~~~
 
-The package should remain independent of WebPage and usable by server, desktop, Unity, and other compatible runtimes.
+Repository:
 
-## Current status
+https://github.com/TrentBest/TheSingularityWorkshop.FSM_Serialization
 
-The project is at the contract/theory stage. The first implementation should be deliberately small and prove deterministic round-tripping before format-specific complexity is introduced.
+The package targets .NET 8 and is intended to remain independent of WebPage.
 
 ## License
 
