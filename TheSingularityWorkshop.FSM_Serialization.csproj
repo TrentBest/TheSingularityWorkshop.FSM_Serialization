@@ -6,11 +6,11 @@
     <Nullable>enable</Nullable>
 
     <PackageId>TheSingularityWorkshop.FSM_Serialization</PackageId>
-    <Version>0.1.0-alpha.1</Version>
+    <Version>0.1.0-alpha.2</Version>
     <Authors>Trent Best</Authors>
     <Company>The Singularity Workshop</Company>
-    <Description>Deterministic serialization infrastructure for FSM ecosystem state, MicroBundle composition, Experience manifests, and lineage.</Description>
-    <PackageTags>FSM;FSM_COS;MicroBundle;Experience;serialization;digital-reality</PackageTags>
+    <Description>Deterministic binary serialization infrastructure for FSM ecosystem state, MicroBundle composition, Experience manifests, and lineage.</Description>
+    <PackageTags>FSM;FSM_COS;MicroBundle;Experience;serialization;binary;digital-reality</PackageTags>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/TrentBest/TheSingularityWorkshop.FSM_Serialization</PackageProjectUrl>
     <RepositoryUrl>https://github.com/TrentBest/TheSingularityWorkshop.FSM_Serialization</RepositoryUrl>
