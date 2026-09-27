@@ -1,3 +1,4 @@
 <Solution>
+  <Project Path="../TheSingularityWorkshop.FSM_Serialization.Tests/TheSingularityWorkshop.FSM_Serialization.Tests.csproj" />
   <Project Path="TheSingularityWorkshop.FSM_Serialization.csproj" />
 </Solution>
