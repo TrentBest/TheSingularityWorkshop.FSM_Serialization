@@ -3,84 +3,337 @@
 [![Verify](https://github.com/TrentBest/TheSingularityWorkshop.FSM_Serialization/actions/workflows/verify.yml/badge.svg)](https://github.com/TrentBest/TheSingularityWorkshop.FSM_Serialization/actions/workflows/verify.yml)
 [![codecov](https://codecov.io/gh/TrentBest/TheSingularityWorkshop.FSM_Serialization/graph/badge.svg)](https://codecov.io/gh/TrentBest/TheSingularityWorkshop.FSM_Serialization)
 [![NuGet](https://img.shields.io/nuget/v/TheSingularityWorkshop.FSM_Serialization.svg)](https://www.nuget.org/packages/TheSingularityWorkshop.FSM_Serialization/)
+[![NuGet Downloads](https://img.shields.io/nuget/dt/TheSingularityWorkshop.FSM_Serialization.svg)](https://www.nuget.org/packages/TheSingularityWorkshop.FSM_Serialization/)
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE.txt)
 
 ![FSM Serialization — The Binary Boundary](docs/images/fsm-serialization-01-boundary.jpg)
 
-**A small, deterministic binary boundary for the FSM ecosystem.**
+**A small, explicit binary representation boundary for The Singularity Workshop FSM ecosystem.**
 
-TheSingularityWorkshop.FSM_Serialization provides the low-level contracts and stream adapters needed to turn semantic state into bytes — and bytes back into semantic state.
+**TheSingularityWorkshop.FSM_Serialization** provides the low-level contracts and stream adapters required to move domain-owned state across a byte-oriented representation boundary.
 
-It is intentionally simple.
+It deliberately does **not** attempt to become a general-purpose object graph serializer, persistence framework, schema registry, database abstraction, or application framework.
 
-Your domain objects own their meaning. This package gives them a clean, reusable place to cross the binary representation boundary.
+> **The type that owns the meaning should own the representation rules. The serialization package should provide the boundary, not invent the meaning.**
 
-## Why this package exists
+---
 
-As the FSM ecosystem grows, state needs to move between places:
+## At a glance
 
-- memory and persistence;
-- applications and services;
-- caches and transports;
-- manifests and composition systems;
-- WebPage, Forge, desktop, Unity, and other compatible hosts.
+| Property | Value |
+|---|---|
+| Package | **TheSingularityWorkshop.FSM_Serialization** |
+| Current version | **0.1.0-alpha.2** |
+| Target framework | .NET 8 |
+| Language | C# |
+| License | MIT |
+| Repository | [GitHub](https://github.com/TrentBest/TheSingularityWorkshop.FSM_Serialization) |
+| Package | [NuGet](https://www.nuget.org/packages/TheSingularityWorkshop.FSM_Serialization/) |
+| Coverage | [Codecov](https://codecov.io/gh/TrentBest/TheSingularityWorkshop.FSM_Serialization) |
+| CI | GitHub Actions |
 
-Those systems should not each invent their own binary stream abstraction.
+This is an **alpha package**. The API is intentionally small, but the binary contracts should still be treated as explicit infrastructure: changes to representation semantics should be made deliberately and protected by tests.
 
-FSM_Serialization provides the shared boundary.
+---
 
-The package originated in the WebPage/Workshop proving ground, where the binary IO model was exercised before being extracted into a reusable package.
+## What problem does this solve?
 
-## The basic idea
+As a system grows, semantic state eventually has to cross boundaries.
 
-The relationship is deliberately straightforward:
+A state machine may need to persist state. A composition system may need to represent a manifest. A runtime may need to move configuration between processes. A cache may need a compact representation. A host may need to reconstruct an object from bytes.
 
-```text
-Your semantic type
-      |
-      | Pack
-      v
-  bytes / stream
-      |
-      | Unpack
-      v
-Reconstructed semantic type
-```
+Without a shared boundary, every subsystem tends to invent its own serialization abstraction.
 
-The package supplies four core contracts:
+~~~text
+Application A ──> custom binary format
+Application B ──> another stream abstraction
+Application C ──> JSON-specific representation
+Application D ──> database-specific representation
+~~~
 
-- `IBinaryStream` — the byte-oriented stream boundary.
-- `IBinaryPackable` — a type that knows how to write its representation.
-- `IBinaryUnpackable` — a type that knows how to reconstruct its state.
-- `IBinarySerializable` — the combined pack/unpack contract.
+That creates coupling in the wrong place.
 
-It also includes two useful stream implementations:
+FSM_Serialization extracts the reusable part:
 
-- `MemoryBinaryStream` — an in-memory implementation, useful for buffering and tests.
-- `StreamBinaryStream` — an adapter over the standard .NET `Stream`.
+~~~text
+                    SEMANTIC DOMAIN
+                          │
+                          │ owns meaning
+                          ▼
+                 IBinaryPackable
+                          │
+                        Pack
+                          │
+                          ▼
+                    IBinaryStream
+                          │
+             ┌────────────┼────────────┐
+             ▼            ▼            ▼
+           memory       .NET        host/storage
+                         Stream       boundary
+             │            │            │
+             └────────────┼────────────┘
+                          ▼
+                 IBinaryUnpackable
+                          │
+                       Unpack
+                          │
+                          ▼
+                  SEMANTIC DOMAIN
+~~~
 
-![Representation Boundary](docs/images/fsm-serialization-02-representation-boundary.jpg)
+The package owns the **representation boundary**.
 
-## Install
+The calling type owns the **semantic contract**.
 
-From NuGet:
+That distinction is the foundation of the package.
 
-```bash
+---
+
+## Why binary?
+
+Binary is useful when a system needs an explicit, compact representation with predictable byte-level behavior.
+
+It can be appropriate for:
+
+- runtime state;
+- compact configuration;
+- persistence representations;
+- cache entries;
+- manifests;
+- dependency metadata;
+- identity and version records;
+- lineage metadata;
+- transport payloads;
+- generated or hand-authored machine representations.
+
+Binary is not automatically better than JSON, XML, text, or another representation. The point of this package is not to declare a universal wire format.
+
+The point is to provide a **small representation boundary** that higher-level systems can use when binary representation is appropriate.
+
+---
+
+## Installation
+
+### .NET CLI
+
+~~~bash
 dotnet add package TheSingularityWorkshop.FSM_Serialization --version 0.1.0-alpha.2
-```
+~~~
 
-Or add it to a project file:
+### PackageReference
 
-```xml
+~~~xml
 <PackageReference Include="TheSingularityWorkshop.FSM_Serialization" Version="0.1.0-alpha.2" />
-```
+~~~
 
-The package currently targets **.NET 8**.
+The package is available from [NuGet.org](https://www.nuget.org/packages/TheSingularityWorkshop.FSM_Serialization/).
 
-## Quick start
+> **Alpha notice:** use the explicit version you have validated in your application. Do not assume that alpha releases are binary-format compatible with one another.
 
-A type decides what its own state means and implements the binary contracts:
+---
 
-```csharp
+## Requirements
+
+The current package targets **.NET 8**.
+
+The test project also targets .NET 8.
+
+The package intentionally has no dependency on an application host, database, filesystem, browser runtime, Unity runtime, GUI framework, or other platform-specific execution environment.
+
+---
+
+# Core API
+
+The public surface is deliberately small.
+
+## IBinaryStream
+
+IBinaryStream is the byte-oriented boundary used by packable and unpackable types.
+
+~~~csharp
+public interface IBinaryStream : IDisposable
+{
+    bool CanRead { get; }
+    bool CanWrite { get; }
+
+    long Position { get; set; }
+    long Length { get; }
+
+    int Read(Span<byte> buffer);
+    void Write(ReadOnlySpan<byte> buffer);
+    void Flush();
+}
+~~~
+
+It exposes only the operations needed by the current binary contract:
+
+- whether reading is supported;
+- whether writing is supported;
+- current position;
+- length;
+- byte reads;
+- byte writes;
+- flushing;
+- disposal.
+
+The abstraction intentionally does not expose filesystem paths, filenames, database connections, sockets, serialization schemas, or domain metadata.
+
+### Read semantics
+
+Read returns the number of bytes actually read.
+
+A caller must not assume that one call necessarily fills the supplied buffer.
+
+For fixed-width values, implementations should verify that the required number of bytes was received before interpreting the value.
+
+~~~csharp
+Span<byte> buffer = stackalloc byte[sizeof(int)];
+
+if (stream.Read(buffer) != buffer.Length)
+    throw new EndOfStreamException();
+~~~
+
+This is important because **the stream boundary does not silently manufacture missing data**.
+
+---
+
+## IBinaryPackable
+
+IBinaryPackable defines the outbound direction:
+
+~~~csharp
+public interface IBinaryPackable
+{
+    void Pack(IBinaryStream stream);
+}
+~~~
+
+The implementing type decides:
+
+- which fields are represented;
+- their order;
+- their binary widths;
+- their encoding;
+- whether optional data is present;
+- whether version information is included;
+- how nested values are represented.
+
+The package does not infer any of those decisions.
+
+---
+
+## IBinaryUnpackable
+
+IBinaryUnpackable defines the inbound direction:
+
+~~~csharp
+public interface IBinaryUnpackable
+{
+    void Unpack(IBinaryStream stream);
+}
+~~~
+
+The implementing type owns reconstruction semantics.
+
+This is intentionally symmetrical with Pack, but the two contracts remain independent.
+
+A type may be pack-only or unpack-only when its domain requires that distinction.
+
+---
+
+## IBinarySerializable
+
+IBinarySerializable combines the two directional contracts:
+
+~~~csharp
+public interface IBinarySerializable :
+    IBinaryPackable,
+    IBinaryUnpackable
+{
+}
+~~~
+
+It is a composition of capabilities, not a separate serializer engine.
+
+The package does not require every type to implement it.
+
+---
+
+# Stream implementations
+
+## MemoryBinaryStream
+
+MemoryBinaryStream provides an in-memory implementation of IBinaryStream.
+
+It is useful for:
+
+- unit tests;
+- buffering;
+- temporary representations;
+- round-trip verification;
+- building a byte representation before handing it to another subsystem.
+
+Example:
+
+~~~csharp
+using var stream = new MemoryBinaryStream();
+
+stream.Write([1, 2, 3, 4]);
+
+stream.Position = 0;
+
+Span<byte> buffer = stackalloc byte[4];
+var count = stream.Read(buffer);
+~~~
+
+The current contents can also be copied with:
+
+~~~csharp
+byte[] bytes = stream.ToArray();
+~~~
+
+The constructor can start from an existing byte array:
+
+~~~csharp
+using var stream = new MemoryBinaryStream(existingBytes);
+~~~
+
+The stream starts at position zero after construction.
+
+---
+
+## StreamBinaryStream
+
+StreamBinaryStream adapts an ordinary .NET System.IO.Stream to IBinaryStream.
+
+Example:
+
+~~~csharp
+using var file = File.OpenRead("state.bin");
+using var stream = new StreamBinaryStream(file);
+~~~
+
+This lets domain serialization code depend on IBinaryStream while the host remains free to choose a standard .NET stream implementation.
+
+### Ownership
+
+The current adapter owns the wrapped Stream.
+
+Disposing StreamBinaryStream disposes the underlying .NET stream.
+
+If a host requires different lifetime semantics, that policy belongs to a future adapter or a higher-level abstraction rather than being silently assumed by the current implementation.
+
+---
+
+# Quick start
+
+A type defines its own binary representation.
+
+The following example stores one 32-bit integer:
+
+~~~csharp
+using System.Buffers.Binary;
 using TheSingularityWorkshop.FSM_Serialization;
 
 public sealed class ExampleState : IBinarySerializable
@@ -98,314 +351,663 @@ public sealed class ExampleState : IBinarySerializable
 
     public void Pack(IBinaryStream stream)
     {
-        Span<byte> bytes = stackalloc byte[sizeof(int)];
-        BitConverter.TryWriteBytes(bytes, Value);
-        stream.Write(bytes);
+        Span<byte> buffer = stackalloc byte[sizeof(int)];
+        BinaryPrimitives.WriteInt32LittleEndian(buffer, Value);
+        stream.Write(buffer);
     }
 
     public void Unpack(IBinaryStream stream)
     {
-        Span<byte> bytes = stackalloc byte[sizeof(int)];
+        Span<byte> buffer = stackalloc byte[sizeof(int)];
 
-        if (stream.Read(bytes) != bytes.Length)
+        if (stream.Read(buffer) != buffer.Length)
             throw new EndOfStreamException();
 
-        Value = BitConverter.ToInt32(bytes);
+        Value = BinaryPrimitives.ReadInt32LittleEndian(buffer);
     }
 }
-```
+~~~
 
-For an in-memory round trip:
+A round trip is then straightforward:
 
-```csharp
+~~~csharp
 using var stream = new MemoryBinaryStream();
 
 var original = new ExampleState(42);
+
 original.Pack(stream);
 
 stream.Position = 0;
 
 var restored = new ExampleState();
+
 restored.Unpack(stream);
-```
 
-The important design point is that **FSM_Serialization does not decide what `Value` means**. The owning type does.
+Console.WriteLine(restored.Value); // 42
+~~~
 
-## Pros and trade-offs
+The important part is not the integer.
 
-FSM_Serialization is deliberately small. That simplicity is useful, but it comes with explicit trade-offs.
+The important part is the ownership boundary:
 
-### Pros
+~~~text
+ExampleState
+    │
+    │ defines representation
+    ▼
+Pack / Unpack
+    │
+    ▼
+IBinaryStream
+    │
+    ▼
+bytes
+~~~
 
-- **Small boundary:** a handful of contracts keep the serialization surface easy to understand and integrate.
+FSM_Serialization supplies the last boundary. ExampleState supplies the meaning.
 
-- **Explicit ownership:** domain types decide what their state means and how it is represented.
+---
 
-- **Binary-first:** representations can be compact, deterministic, and suitable for persistence or transport.
+# Designing a binary representation
 
-- **No hidden serializer magic:** there is no reflection-driven object graph engine or global registry imposed by the package.
+FSM_Serialization deliberately leaves format design to the type that owns the data.
 
-- **Storage-neutral:** `IBinaryStream` separates representation from memory, files, pipes, and other stream implementations.
+An implementation should answer questions such as:
 
-- **Easy to test:** the core contracts can be exercised without a database, filesystem, network, or application host.
+1. What fields are represented?
+2. In what order are they written?
+3. What width does each field use?
+4. What byte ordering is used?
+5. How are strings encoded?
+6. How are collections represented?
+7. How are optional values represented?
+8. How is version information represented?
+9. What happens when data is incomplete?
+10. What happens when an older or newer representation is encountered?
 
-- **Composable:** higher-level FSM packages can build their own representations on top of the same boundary.
+For example:
 
-### Trade-offs
+~~~text
+[int id][int value]
+~~~
 
-- **You own the format:** implementing types must define field order, widths, encoding, compatibility rules, and version behavior.
+is a representation contract.
 
-- **Less automatic than general-purpose serializers:** there is intentionally no automatic object-graph serialization here.
+So is:
 
-- **Binary is less human-readable:** inspecting a representation is harder than inspecting JSON or another text format.
+~~~text
+[version][id][flags][payload-length][payload]
+~~~
 
-- **Compatibility is a domain responsibility:** changing a binary representation requires an explicit migration or versioning strategy when old data must remain readable.
+FSM_Serialization provides the mechanism for writing and reading those bytes. It does not declare which format is correct for a particular domain.
 
-- **Not a storage layer:** the package gives you a representation boundary, not file management, databases, caching policy, or transport.
+---
 
-- **Not a schema framework:** if an application needs schemas, generated codecs, or rich reflection metadata, those concerns belong above this primitive layer.
+# Determinism
 
-The goal is not to eliminate those trade-offs. The goal is to make the boundary explicit so the system using it can make those choices deliberately.
+A binary representation can be deterministic, but the package does not automatically make arbitrary objects deterministic.
 
-## What you get
+Determinism is a property of the representation contract.
 
-### Binary stream abstraction
+If a type needs deterministic output, it should explicitly control:
 
-![IBinaryStream Contract Blueprint](docs/images/fsm-serialization-03-binary-stream-blueprint.jpg)
+- field ordering;
+- collection ordering;
+- byte ordering;
+- string encoding;
+- optional-field rules;
+- version fields;
+- identifier representation;
+- nested representation rules.
 
-`IBinaryStream` keeps consumers working against a small byte-oriented contract instead of tying domain code directly to a particular storage implementation.
+For example, a semantically unordered collection may need a canonical ordering before it is packed.
 
-It exposes the essentials:
+~~~text
+semantic collection
+       │
+       ▼
+canonical ordering
+       │
+       ▼
+binary representation
+~~~
 
-- read/write capability;
-- position and length;
-- byte reads and writes;
-- flushing;
-- disposal.
+This matters when serialized bytes are used for:
 
-### Memory and .NET stream adapters
-
-Use `MemoryBinaryStream` when you need an in-memory representation.
-
-Use `StreamBinaryStream` when you already have a standard .NET `Stream`.
-
-This keeps the serialization contract separate from the storage mechanism.
-
-### Explicit pack and unpack ownership
-
-A serializable type is responsible for its representation.
-
-That means the package does not require:
-
-- reflection-driven object graphs;
-- a global serializer registry;
-- JSON;
-- a database;
-- a particular persistence system;
-- domain-specific metadata hidden inside the serializer.
-
-You define the representation that matters to your type.
-
-## Deterministic representation
-
-![Deterministic vs. Non-Deterministic Representation](docs/images/fsm-serialization-04-deterministic-representation.jpg)
-
-When a domain contract requires deterministic output, the implementation should make ordering and representation rules explicit.
-
-That can support:
-
-- reproducible persistence;
 - content identity;
 - caching;
 - synchronization;
-- version comparison;
-- debugging;
-- lineage records.
+- reproducible builds;
+- comparison;
+- lineage;
+- integrity checks.
 
-Determinism belongs to the representation contract and the type implementing it. It is not a promise that arbitrary object graphs will magically serialize identically.
+The package does not pretend that Pack alone guarantees any of those properties.
 
-## Round-tripping
+---
 
-![Semantic Round-Trip](docs/images/fsm-serialization-05-semantic-round-trip.jpg)
+# Round-trip semantics
 
-The fundamental invariant is:
+The fundamental operation is a semantic round trip:
 
-```text
-A
- |
- | Pack
- v
-bytes
- |
- | Unpack
- v
-A'
-```
+~~~text
+       A
+       │
+     Pack
+       │
+       ▼
+     bytes
+       │
+    Unpack
+       │
+       ▼
+       A'
+~~~
 
-`A'` does not need to be the same object instance.
+A' does not need to be the same object instance as A.
 
-It needs to preserve the information required by the owning semantic contract.
+It needs to contain the information required by the owning semantic contract.
 
-The test suite exercises this boundary directly before higher-level FSM objects are introduced.
+This distinction is especially important for stateful systems.
 
-## What belongs here
+A serializer should not be judged by whether it reproduces an object graph's incidental runtime identity. It should be judged against the semantic information the domain says is persistent.
 
-FSM_Serialization is intentionally a foundation package.
+---
 
-It is appropriate for binary representation of things such as:
+# Versioning and compatibility
 
-- FSM state;
-- MicroBundle descriptors;
-- Experience manifests;
-- dependency declarations;
-- identity and version metadata;
-- lineage metadata;
-- runtime configuration;
-- persistence and transport representations.
+Binary formats are contracts.
 
-The domain package that owns a type remains responsible for deciding what its fields mean and how those fields are represented.
+Once bytes are persisted, cached, transmitted, or published, the representation may outlive the code that produced it.
 
-## What does not belong here
+That makes compatibility an explicit design concern.
 
-This package is **not**:
+A type that expects long-lived binary data should consider:
 
-- an FSM domain rules engine;
-- a game rules system;
+~~~text
+identity
+version
+format version
+field representation
+dependency versions
+compatibility rules
+~~~
+
+A useful distinction is:
+
+- **object version** — the version of the semantic object or package;
+- **format version** — the version of the byte representation;
+- **dependency version** — the version of another representation required to interpret the data.
+
+These are not necessarily the same thing.
+
+FSM_Serialization provides the byte boundary. It does not impose a versioning scheme because different domains have different compatibility requirements.
+
+---
+
+# Storage is not serialization
+
+A common architectural mistake is allowing serialization code to absorb storage concerns.
+
+These are different responsibilities:
+
+~~~text
+Representation
+    │
+    ▼
+FSM_Serialization
+    │
+    ▼
+Storage / transport / host
+~~~
+
+Serialization answers:
+
+> **How are these semantic values represented as bytes?**
+
+Storage answers:
+
+> **Where do those bytes live?**
+
+Transport answers:
+
+> **How do those bytes move between boundaries?**
+
+A database, filesystem, cache, object store, HTTP service, message bus, or network protocol can consume the representation without becoming part of FSM_Serialization.
+
+---
+
+# Representation is not reality
+
+The package follows a broader architectural principle used throughout The Singularity Workshop ecosystem:
+
+> **A representation is not the thing it represents.**
+
+For example:
+
+~~~text
+FSM state
+   │
+   │ semantic meaning
+   ▼
+domain object
+   │
+   │ representation
+   ▼
+FSM_Serialization
+   │
+   │ bytes
+   ▼
+storage / transport / host
+~~~
+
+The bytes are not the state.
+
+They are a representation from which the required semantic state can be reconstructed.
+
+Keeping that distinction explicit prevents representation mechanics from becoming accidental domain architecture.
+
+---
+
+# Relationship to the FSM ecosystem
+
+FSM_Serialization is intended to sit below higher-level FSM composition and host systems.
+
+A conceptual architecture is:
+
+~~~text
+                 FSM_API
+                    │
+                    ▼
+              domain behavior
+                    │
+                    ▼
+                FSM_COS
+                    │
+             composition / manifests
+                    │
+                    ▼
+        FSM_Serialization
+                    │
+          binary representation
+                    │
+          ┌─────────┴─────────┐
+          ▼                   ▼
+      storage              transport
+          │                   │
+          └─────────┬─────────┘
+                    ▼
+              host / runtime
+                    │
+          WebPage / Unity / Desktop
+~~~
+
+The exact dependency graph can evolve.
+
+The responsibility boundary should remain stable.
+
+| Layer | Responsibility |
+|---|---|
+| FSM_API | State-machine behavior and runtime state primitives |
+| FSM_COS | Composition, manifests, dependencies, MicroBundles, arbitration |
+| FSM_Serialization | Binary representation boundary |
+| Storage layer | Persistence and allocation |
+| Transport layer | Movement between external boundaries |
+| Host | Execution and manifestation |
+| Experience | What a user encounters |
+
+FSM_Serialization should remain below application-specific manifestation.
+
+---
+
+# MicroBundles and manifests
+
+The package is intentionally compatible with the broader idea of representing an Experience as a composition rather than as one giant application-specific object graph.
+
+Conceptually:
+
+~~~text
+Experience
+ ├── identity
+ ├── version
+ ├── ontology
+ ├── MicroBundles
+ │    ├── identity
+ │    ├── version
+ │    ├── configuration
+ │    └── dependencies
+ └── lineage
+      ├── source
+      ├── contributors
+      └── ancestry
+~~~
+
+That does **not** mean FSM_Serialization currently defines an Experience manifest schema.
+
+It does not.
+
+The package supplies the low-level representation boundary through which a higher-level system can eventually encode such structures.
+
+---
+
+# What belongs in this package?
+
+Good candidates include:
+
+- byte-oriented serialization contracts;
+- stream adapters;
+- small representation primitives;
+- representation-level validation helpers;
+- future format-neutral binary utilities that remain independent of domain meaning.
+
+The strongest test is:
+
+> **Can this feature be useful to multiple domain packages without requiring it to understand their semantics?**
+
+If yes, it may belong here.
+
+---
+
+# What does not belong here?
+
+This package should not become:
+
+- an FSM rules engine;
+- a game system;
 - an AEC model;
 - a GUI framework;
-- a WebPage model library;
-- a physics engine;
-- a MicroBundle semantic layer;
-- a database;
-- a filesystem abstraction;
-- an application framework.
+- a browser framework;
+- a Unity integration layer;
+- a database abstraction;
+- a filesystem framework;
+- an HTTP client;
+- an application configuration system;
+- a MicroBundle implementation;
+- an Experience runtime;
+- a reflection-driven object graph serializer;
+- a global serializer registry.
 
-Those concerns can use this package without becoming part of it.
+Those systems can **use** FSM_Serialization. They should not be forced into it.
 
-For example, a filesystem can consume `IBinaryStream`, but filesystem policy belongs to the host/storage layer.
+---
 
-## Relationship to the FSM ecosystem
+# Explicit design trade-offs
 
-![FSM Ecosystem Representation Boundary](docs/images/fsm-serialization-06-ecosystem.jpg)
+### Benefits
 
-The broader architecture separates responsibilities:
+- **Small surface area** — the core contracts are easy to inspect.
+- **Explicit semantics** — domain types control representation.
+- **Binary-first** — suitable for compact byte representations.
+- **Storage-neutral** — representation is separated from where bytes live.
+- **Transport-neutral** — the same representation can cross different boundaries.
+- **Testable** — the contracts can be tested without external infrastructure.
+- **Composable** — higher-level packages can build their own representations above the primitive boundary.
+- **No hidden reflection** — no automatic object graph traversal is imposed.
+- **No global registry** — types do not need to register themselves with a central serializer.
 
-```text
-FSM_API
-   |
-FSM_COS / MicroBundle composition
-   |
-FSM_Serialization  <-- binary representation boundary
-   |
-FSM_Memory         <-- persistence / cache
-   |
-FSM_REST           <-- transport
-   |
-WebPage / AnyApp   <-- manifestation
-```
+### Costs
 
-FSM_Serialization crosses the representation boundary.
+- **You own the format.**
+- **You must define compatibility rules.**
+- **Binary data is less immediately human-readable than text formats.**
+- **Schema evolution is an application/domain responsibility.**
+- **Partial reads must be handled correctly.**
+- **The package does not automatically provide version negotiation.**
+- **The package does not automatically provide persistence.**
 
-It does not decide what an Experience means.
+These are deliberate trade-offs rather than missing features.
 
-## WebPage and the proving ground
+---
 
-WebPage was where this binary IO model was first exercised.
+# Testing
 
-The extraction is intentional:
+The repository includes an xUnit test project covering the current contracts and adapters.
 
-```text
-WebPage / Workshop
-        |
-        | prove the model
-        v
-FSM_Serialization
-        |
-        | reusable package
-        v
-WebPage / Workshop
-```
+The current suite verifies:
 
-WebPage and other hosts should consume the package rather than maintain parallel binary contracts.
-
-That gives the same small serialization boundary to every compatible host without making those hosts share domain-specific implementation.
-
-## Testing and coverage
-
-The repository contains an xUnit test project alongside the library.
-
-The test suite is intended to protect the binary boundary itself, including:
-
+- empty MemoryBinaryStream behavior;
+- readable/writable capability reporting;
+- byte writes and reads;
+- preservation of written bytes;
+- initialization from existing bytes;
+- null-input rejection;
+- end-of-input behavior;
+- positioning and overwrite behavior;
+- StreamBinaryStream capability delegation;
+- StreamBinaryStream null-input rejection;
+- writes reaching the wrapped .NET stream;
 - pack/unpack round trips;
-- stream piping;
-- memory stream behavior;
-- standard .NET stream delegation;
-- stream capability reporting;
-- incomplete input handling;
-- combined `IBinarySerializable` behavior.
+- combined IBinarySerializable behavior;
+- incomplete binary input handling.
 
-GitHub Actions is configured as a **manual verification workflow** so validation can be run deliberately.
+The test project targets .NET 8 and references the library project directly.
 
-Verification performs:
+The repository verification workflow collects Cobertura coverage and uploads the report to Codecov.
+
+---
+
+# Continuous integration and publication
+
+The repository uses GitHub Actions through **.github/workflows/verify.yml**.
+
+The verification workflow performs:
 
 1. restore;
 2. Release build;
-3. xUnit tests;
+3. test execution;
 4. Cobertura coverage collection;
-5. Codecov upload;
-6. package creation;
-7. test/coverage artifact upload.
+5. coverage normalization;
+6. Codecov upload;
+7. NuGet package creation;
+8. package artifact upload;
+9. test and coverage artifact upload.
 
-The Codecov and workflow badges above reflect those configured verification services; they do not replace running the workflow.
+NuGet publication is a separate manual step using NuGet Trusted Publishing through GitHub's OIDC identity.
 
-## Documentation
+The separation is intentional:
 
-The README is the starting point for using the package.
+~~~text
+verify
+  │
+  ├── build
+  ├── test
+  ├── coverage
+  └── pack
+        │
+        ▼
+   package artifact
+        │
+        ▼
+manual publish
+~~~
 
-For the deeper architectural reasoning, see the theory documentation in the repository. It covers topics such as:
+A successful build does not silently publish a package.
+
+---
+
+# Package contents
+
+The package is built from the root project **TheSingularityWorkshop.FSM_Serialization.csproj**.
+
+The package includes:
+
+- the compiled library;
+- XML documentation;
+- this README as the NuGet package README;
+- the MIT license file;
+- the documentation images used by the package README.
+
+Build output and local artifacts are excluded from source control.
+
+---
+
+# Repository structure
+
+~~~text
+TheSingularityWorkshop.FSM_Serialization/
+│
+├── .github/
+│   └── workflows/
+│       └── verify.yml
+│
+├── docs/
+│   ├── THEORY.md
+│   └── images/
+│
+├── src/
+│   ├── IBinaryStream.cs
+│   ├── IBinaryPackable.cs
+│   ├── IBinaryUnpackable.cs
+│   ├── IBinarySerializable.cs
+│   ├── MemoryBinaryStream.cs
+│   └── StreamBinaryStream.cs
+│
+├── TheSingularityWorkshop.FSM_Serialization.Tests/
+│   ├── BinarySerializationTests.cs
+│   └── TheSingularityWorkshop.FSM_Serialization.Tests.csproj
+│
+├── LICENSE.txt
+├── README.md
+├── TheSingularityWorkshop.FSM_Serialization.csproj
+└── TheSingularityWorkshop.FSM_Serialization.slnx
+~~~
+
+The implementation project is intentionally small and the tests live beside the solution.
+
+---
+
+# Documentation map
+
+This repository has two complementary documentation layers.
+
+### README
+
+This document answers:
+
+> **What is the package, why would I use it, how do I install it, and how do I use the API?**
+
+### Theory
+
+See [docs/THEORY.md](docs/THEORY.md).
+
+The theory answers:
+
+> **Why does this boundary exist, and what architectural principles should remain intact as the package grows?**
+
+The theory covers:
 
 - representation versus reality;
-- canonical representation;
 - binary boundaries;
-- storage versus representation;
+- stream boundaries;
+- representation versus storage;
+- canonical representation;
 - composition manifests;
 - demand-driven reconstruction;
 - versioning;
 - lineage;
-- format neutrality.
+- format neutrality;
+- extraction from the WebPage proving ground.
 
-The README should answer **"What is this and how do I use it?"**
+---
 
-The theory should answer **"Why is it designed this way?"**
+# Project status
 
-## Project status
+**Current status: Alpha**
 
-This package is in **alpha**.
+The package is intentionally small and is being established as reusable infrastructure for the broader FSM ecosystem.
 
-The current implementation is deliberately small and binary-first. Higher-level canonical manifest formats can be introduced later without replacing the primitive stream and pack/unpack contracts.
+The current release establishes the primitive binary boundary:
 
-Current package version:
+~~~text
+IBinaryPackable
+        │
+        ▼
+  IBinaryStream
+        │
+        ▼
+IBinaryUnpackable
+~~~
 
-```text
-0.1.0-alpha.2
-```
+Higher-level serializers, schemas, manifests, and domain-specific representations should only be added when they have a clear architectural owner and do not compromise the boundary established here.
 
-## Contributing
+---
 
-The most useful contributions preserve the package boundary:
+# Contributing and evolution
 
-- keep the core contracts small;
-- keep semantic ownership with the calling type;
-- avoid pulling domain-specific rules into the serialization layer;
-- add tests when changing binary behavior;
-- keep storage and transport concerns in their respective layers.
+When changing this package, preserve the following invariants:
 
-For architectural questions, the theory documentation is the appropriate place to go deeper.
+### 1. Keep semantic ownership outside the primitive
 
-## License
+The serialization layer should not need to understand what a domain object means.
 
-MIT. See [LICENSE.txt](LICENSE.txt).
+### 2. Keep the byte boundary explicit
 
-## Repository
+Avoid introducing hidden global state or implicit serialization behavior.
 
-[TheSingularityWorkshop.FSM_Serialization](https://github.com/TrentBest/TheSingularityWorkshop.FSM_Serialization)
+### 3. Prefer small composable contracts
+
+A type should be able to depend on the smallest capability it actually requires.
+
+### 4. Treat binary formats as contracts
+
+If a change affects representation semantics, document the compatibility implications and add tests.
+
+### 5. Test behavior, not implementation trivia
+
+Tests should establish the observable contract of streams and representations.
+
+### 6. Do not pull application infrastructure downward
+
+Storage, transport, UI, host lifecycle, and application policy belong above this layer.
+
+### 7. Preserve format neutrality at the architecture level
+
+Binary is the current concrete representation boundary. It should not become an excuse to couple semantic models to one storage or transport technology.
+
+---
+
+# License
+
+This project is licensed under the MIT License.
+
+See [LICENSE.txt](LICENSE.txt).
+
+---
+
+# The Singularity Workshop
+
+**TheSingularityWorkshop.FSM_Serialization** is part of The Singularity Workshop ecosystem.
+
+The broader architectural direction is:
+
+~~~text
+             behavior
+                │
+             FSM_API
+                │
+                ▼
+            composition
+                │
+             FSM_COS
+                │
+                ▼
+         representation
+                │
+       FSM_Serialization
+                │
+          ┌─────┴─────┐
+          ▼           ▼
+       storage     transport
+          │           │
+          └─────┬─────┘
+                ▼
+              host
+                │
+        manifestation / experience
+~~~
+
+The package's job is deliberately narrow:
+
+> **Provide a clean boundary across which semantic state can become bytes, and bytes can become semantic state again.**
+
+Everything else should have to earn its way into a higher-level layer.
