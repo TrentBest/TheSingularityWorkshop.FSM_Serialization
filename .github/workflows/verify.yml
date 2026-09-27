@@ -9,7 +9,7 @@ on:
       publish:
         description: "Publish the package to NuGet.org"
         required: false
-        default: false
+        default: true
         type: boolean
 
 permissions:
