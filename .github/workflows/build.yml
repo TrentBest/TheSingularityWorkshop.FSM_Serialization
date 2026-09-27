@@ -1,4 +1,4 @@
-name: Verify
+name: Package FSM Serialization
 
 on:
   push:
@@ -9,7 +9,7 @@ on:
       publish:
         description: "Publish the package to NuGet.org"
         required: false
-        default: true
+        default: false
         type: boolean
 
 permissions:
@@ -83,7 +83,7 @@ jobs:
   publish_nuget:
     needs: build-and-test
     runs-on: ubuntu-24.04
-    if: ${{ needs.build-and-test.result == 'success' }}
+    if: github.event_name == 'workflow_dispatch' && inputs.publish == true
     permissions:
       contents: read
       id-token: write
