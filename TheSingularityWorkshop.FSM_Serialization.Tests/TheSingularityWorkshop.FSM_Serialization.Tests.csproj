@@ -21,7 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..TheSingularityWorkshop.FSM_Serialization.csproj" />
+    <ProjectReference Include="..\TheSingularityWorkshop.FSM_Serialization.csproj" />
   </ItemGroup>
 
 </Project>
