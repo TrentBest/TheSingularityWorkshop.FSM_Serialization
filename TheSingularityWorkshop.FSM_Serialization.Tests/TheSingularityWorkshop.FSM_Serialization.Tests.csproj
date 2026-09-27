@@ -20,4 +20,8 @@
     <Using Include="Xunit" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..TheSingularityWorkshop.FSM_Serialization.csproj" />
+  </ItemGroup>
+
 </Project>
