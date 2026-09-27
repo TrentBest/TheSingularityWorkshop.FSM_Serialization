@@ -1,5 +1,7 @@
 # TheSingularityWorkshop.FSM_Serialization
 
+![FSM Serialization — The Binary Boundary](docs/images/fsm-serialization-01-boundary.jpg)
+
 **Deterministic binary representation for the FSM ecosystem.**
 
 FSM_Serialization defines the boundary between an in-memory semantic model and a byte representation that can be persisted, transported, cached, versioned, compared, or reconstructed.
@@ -9,6 +11,8 @@ The package is deliberately small: it provides the binary stream and pack/unpack
 ## The boundary
 
 Serialization is a representation boundary, not a second domain model.
+
+![Representation Boundary](docs/images/fsm-serialization-02-representation-boundary.jpg)
 
 ~~~text
 Semantic Model
@@ -56,6 +60,8 @@ The reusable foundation consists of:
 
 This package does not introduce a competing JSON serializer or force a particular wire format.
 
+![IBinaryStream Contract Blueprint](docs/images/fsm-serialization-03-binary-stream-blueprint.jpg)
+
 ## What belongs here
 
 FSM_Serialization provides neutral representation infrastructure for:
@@ -93,6 +99,8 @@ A physical filesystem can consume IBinaryStream, but filesystem ownership belong
 
 Where a domain contract defines an ordering, the implementation should make that ordering explicit rather than relying on incidental collection or runtime ordering.
 
+![Deterministic vs. Non-Deterministic Representation](docs/images/fsm-serialization-04-deterministic-representation.jpg)
+
 Deterministic binary representations are useful for:
 
 - reproducible persistence;
@@ -122,6 +130,8 @@ A'
 ~~~
 
 A' need not be the same object instance. It must preserve the information required by the owning semantic contract.
+
+![Semantic Round-Trip](docs/images/fsm-serialization-05-semantic-round-trip.jpg)
 
 The test suite proves this at the binary contract level before higher-level FSM objects are introduced.
 
@@ -166,6 +176,8 @@ WebPage / AnyApp ----- manifestation
 ~~~
 
 The package knows how to cross the representation boundary. It does not decide what an Experience means.
+
+![FSM Ecosystem Representation Boundary](docs/images/fsm-serialization-06-ecosystem.jpg)
 
 ## Current implementation status
 
