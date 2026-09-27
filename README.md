@@ -131,6 +131,42 @@ restored.Unpack(stream);
 
 The important design point is that **FSM_Serialization does not decide what `Value` means**. The owning type does.
 
+## Pros and trade-offs
+
+FSM_Serialization is deliberately small. That simplicity is useful, but it comes with explicit trade-offs.
+
+### Pros
+
+- **Small boundary:** a handful of contracts keep the serialization surface easy to understand and integrate.
+
+- **Explicit ownership:** domain types decide what their state means and how it is represented.
+
+- **Binary-first:** representations can be compact, deterministic, and suitable for persistence or transport.
+
+- **No hidden serializer magic:** there is no reflection-driven object graph engine or global registry imposed by the package.
+
+- **Storage-neutral:** `IBinaryStream` separates representation from memory, files, pipes, and other stream implementations.
+
+- **Easy to test:** the core contracts can be exercised without a database, filesystem, network, or application host.
+
+- **Composable:** higher-level FSM packages can build their own representations on top of the same boundary.
+
+### Trade-offs
+
+- **You own the format:** implementing types must define field order, widths, encoding, compatibility rules, and version behavior.
+
+- **Less automatic than general-purpose serializers:** there is intentionally no automatic object-graph serialization here.
+
+- **Binary is less human-readable:** inspecting a representation is harder than inspecting JSON or another text format.
+
+- **Compatibility is a domain responsibility:** changing a binary representation requires an explicit migration or versioning strategy when old data must remain readable.
+
+- **Not a storage layer:** the package gives you a representation boundary, not file management, databases, caching policy, or transport.
+
+- **Not a schema framework:** if an application needs schemas, generated codecs, or rich reflection metadata, those concerns belong above this primitive layer.
+
+The goal is not to eliminate those trade-offs. The goal is to make the boundary explicit so the system using it can make those choices deliberately.
+
 ## What you get
 
 ### Binary stream abstraction
