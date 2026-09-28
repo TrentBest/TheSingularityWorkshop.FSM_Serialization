@@ -759,6 +759,61 @@ These are deliberate trade-offs rather than missing features.
 
 ---
 
+
+# Performance
+
+The published **0.1.0-alpha.2** package was benchmarked through the companion **FSM_Serialization_Benchmarks** project using BenchmarkDotNet 0.15.2 on .NET 8.0.31, running on an Intel Core i5-10400F (6 physical / 12 logical cores) with RyuJIT AVX2. The benchmark suite exercised sizes of **16, 1,024, 10,000, and 100,000 bytes**.
+
+The results show an important distinction between the package's **representation overhead** and the cost of copying data into MemoryBinaryStream.
+
+## Results
+
+| Operation | Size | MemoryStream | FSM_Serialization | Relative result |
+|---|---:|---:|---:|---:|
+| Construct empty | 16–100,000 | ~7.1–7.3 ns | ~10.2–10.7 ns | ~1.4–1.5× |
+| Write | 100,000 | 39,894.85 ns | 40,005.59 ns | ~1.00× |
+| Read via StreamBinaryStream | 100,000 | 2,272.47 ns | 2,298.40 ns | ~1.01× |
+| ToArray | 100,000 | 80,063.31 ns | 80,227.68 ns | ~1.00× |
+| Position + overwrite | 100,000 | 39,824.53 ns | 80,220.26 ns | ~2.01× |
+| Pack + Unpack round trip | 100,000 | — | 60,152.74 ns | end-to-end contract measurement |
+
+The empty construction benchmark measured MemoryBinaryStream at about **10.2 ns** versus **7.1–7.3 ns** for MemoryStream, with the package stream allocating 88 B versus 64 B. fileciteturn317file0L25-L40
+
+For bulk writes, the abstraction overhead effectively disappears as payload size grows: at 10,000 bytes the package measured **540.28 ns** versus **541.06 ns**, and at 100,000 bytes **40,005.59 ns** versus **39,894.85 ns**. StreamBinaryStream was similarly close at those sizes. fileciteturn317file6L25-L40
+
+StreamBinaryStream is particularly significant for the adapter design. At 100,000 bytes, reading through the adapter measured **2,298.40 ns** versus **2,272.47 ns** for direct MemoryStream access, a ratio of about **1.01×**. At 10,000 bytes the measured ratio was about **1.02×**. fileciteturn317file3L25-L40
+
+ToArray also converged at larger payloads: **80,227.68 ns** for MemoryBinaryStream versus **80,063.31 ns** for MemoryStream at 100,000 bytes, with the same reported 200 KB-scale allocation. fileciteturn317file5L25-L35
+
+The end-to-end IBinarySerializable benchmark measured **64.08 ns**, **207.47 ns**, **1,481.61 ns**, and **60,152.74 ns** at 16, 1,024, 10,000, and 100,000 bytes respectively. This benchmark includes creation of the test value, stream creation, packing, rewinding, creation of the destination value, allocation of its payload, and unpacking. fileciteturn317file4L25-L31
+
+## An important benchmark qualification
+
+The existing-data constructor and direct MemoryBinaryStream read benchmarks are **not apples-to-apples allocation comparisons** with MemoryStream.
+
+MemoryStream(byte[], writable: false) can wrap the supplied array without copying it, while the current MemoryBinaryStream(byte[]) constructor copies the supplied bytes into its internal memory stream. Consequently, the benchmark deliberately exposes the cost of that current design rather than isolating only interface dispatch.
+
+For example, constructing from 100,000 bytes measured **6.05 ns / 64 B** for MemoryStream versus **39,975.93 ns / 100,122 B** for MemoryBinaryStream; reading 100,000 bytes measured **2,272.47 ns / 64 B** for MemoryStream versus **43,128.59 ns / 100,122 B** for MemoryBinaryStream. fileciteturn317file1L25-L35 fileciteturn317file3L25-L39
+
+That result should therefore be read as a **copying-cost measurement**, not evidence that the IBinaryStream abstraction itself is intrinsically 19× slower.
+
+Likewise, the position/overwrite benchmark includes a common input-array copy on both sides; the package path then performs its write through the abstraction. At 100,000 bytes it measured **80,220.26 ns** versus **39,824.53 ns** for the baseline. fileciteturn317file2L25-L35
+
+### What the first benchmark establishes
+
+The first benchmark pass gives the package a useful baseline:
+
+- the empty stream abstraction has a small fixed construction cost;
+- bulk writes converge with MemoryStream as payload size increases;
+- StreamBinaryStream adds very little overhead for large reads;
+- ToArray is effectively at the same throughput at 100 KB;
+- the current MemoryBinaryStream(byte[]) copy is a measurable cost and should remain visible rather than being mistaken for interface overhead;
+- the Pack/Unpack contract is fast enough to establish a concrete end-to-end performance baseline for future representation work.
+
+These numbers are **environment-specific measurements, not guarantees**. Future releases should rerun the benchmark suite when representation or stream implementation changes.
+
+---
+
 # Testing
 
 The repository includes an xUnit test project covering the current contracts and adapters.
