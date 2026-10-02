@@ -32,7 +32,7 @@ It deliberately does **not** attempt to become a general-purpose object graph se
 | Coverage | [Codecov](https://codecov.io/gh/TrentBest/TheSingularityWorkshop.FSM_Serialization) |
 | CI | GitHub Actions |
 
-This is an **alpha package**. The API is intentionally small, but the binary contracts should still be treated as explicit infrastructure: changes to representation semantics should be made deliberately and protected by tests.
+This is the **1.0.0 stable release**. The API is intentionally small, and the binary contracts are treated as explicit infrastructure: changes to representation semantics should be made deliberately, documented, and protected by tests.
 
 ---
 
@@ -118,18 +118,18 @@ The point is to provide a **small representation boundary** that higher-level sy
 ### .NET CLI
 
 ~~~bash
-dotnet add package TheSingularityWorkshop.FSM_Serialization --version 0.1.0-alpha.2
+dotnet add package TheSingularityWorkshop.FSM_Serialization --version 1.0.0
 ~~~
 
 ### PackageReference
 
 ~~~xml
-<PackageReference Include="TheSingularityWorkshop.FSM_Serialization" Version="0.1.0-alpha.2" />
+<PackageReference Include="TheSingularityWorkshop.FSM_Serialization" Version="1.0.0" />
 ~~~
 
 The package is available from [NuGet.org](https://www.nuget.org/packages/TheSingularityWorkshop.FSM_Serialization/).
 
-> **Alpha notice:** use the explicit version you have validated in your application. Do not assume that alpha releases are binary-format compatible with one another.
+> **Stable release:** `1.0.0` establishes the first stable public package contract. Future releases that change binary representation semantics should document the compatibility implications and increment the package version accordingly.
 
 ---
 
@@ -967,7 +967,7 @@ The theory covers:
 
 # Project status
 
-**Current status: Alpha**
+**Current status: Stable (1.0.0)**
 
 The package is intentionally small and is being established as reusable infrastructure for the broader FSM ecosystem.
 
