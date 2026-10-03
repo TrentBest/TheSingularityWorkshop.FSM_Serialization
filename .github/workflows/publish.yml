@@ -2,25 +2,27 @@ name: Publish NuGet
 
 on:
   workflow_dispatch:
-  push:
-    tags:
-      - 'v*'
+    inputs:
+      publish:
+        description: Publish the already-verified package to NuGet.org
+        required: true
+        default: false
+        type: boolean
 
 permissions:
   contents: read
 
 jobs:
-  publish:
+  verify:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Setup .NET
-        uses: actions/setup-dotnet@v4
+        uses: actions/setup-dotnet@v6
         with:
-          dotnet-version: '8.0.x'
+          dotnet-version: 8.0.x
 
       - name: Restore
         run: dotnet restore TheSingularityWorkshop.FSM_Serialization.slnx
@@ -38,11 +40,31 @@ jobs:
       - name: Pack
         run: dotnet pack TheSingularityWorkshop.FSM_Serialization.csproj --configuration Release --no-build --output ./artifacts
 
+      - name: Upload package
+        uses: actions/upload-artifact@v7
+        with:
+          name: fsm-serialization-nuget-package
+          path: ./artifacts/*.nupkg
+
+  publish:
+    needs: verify
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.publish == true }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - name: Download package
+        uses: actions/download-artifact@v8
+        with:
+          name: fsm-serialization-nuget-package
+          path: ./artifacts
+
+      - name: Authenticate with NuGet Trusted Publishing
+        uses: NuGet/login@v1
+        id: login
+        with:
+          user: TheSingularityWorkshop
+
       - name: Publish to NuGet.org
-        env:
-          NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
-        run: >
-          dotnet nuget push "./artifacts/*.nupkg"
-          --api-key "$NUGET_API_KEY"
-          --source "https://api.nuget.org/v3/index.json"
-          --skip-duplicate
+        run: dotnet nuget push "./artifacts/*.nupkg" --api-key "${{ steps.login.outputs.NUGET_API_KEY }}" --source "https://api.nuget.org/v3/index.json" --skip-duplicate
