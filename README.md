@@ -23,7 +23,7 @@ It deliberately does **not** attempt to become a general-purpose object graph se
 | Property | Value |
 |---|---|
 | Package | **TheSingularityWorkshop.FSM_Serialization** |
-| Current version | **0.1.0-alpha.2** |
+| Current version | **1.0.0** |
 | Target framework | .NET 8 |
 | Language | C# |
 | License | MIT |
