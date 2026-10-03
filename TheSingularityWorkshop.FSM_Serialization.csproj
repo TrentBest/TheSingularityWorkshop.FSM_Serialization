@@ -6,7 +6,7 @@
     <Nullable>enable</Nullable>
 
     <PackageId>TheSingularityWorkshop.FSM_Serialization</PackageId>
-    <Version>1.0.0</Version>
+    <Version>0.1.0-alpha.3</Version>
     <Authors>Trent Best</Authors>
     <Company>The Singularity Workshop</Company>
     <Description>Binary serialization infrastructure for FSM ecosystem state, MicroBundle composition, Experience manifests, and lineage.</Description>
