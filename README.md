@@ -23,7 +23,7 @@ It deliberately does **not** attempt to become a general-purpose object graph se
 | Property | Value |
 |---|---|
 | Package | **TheSingularityWorkshop.FSM_Serialization** |
-| Current version | **0.1.0-alpha.2** |
+| Current version | **0.1.0-alpha.3** |
 | Target framework | .NET 8 |
 | Language | C# |
 | License | MIT |
@@ -32,7 +32,7 @@ It deliberately does **not** attempt to become a general-purpose object graph se
 | Coverage | [Codecov](https://codecov.io/gh/TrentBest/TheSingularityWorkshop.FSM_Serialization) |
 | CI | GitHub Actions |
 
-This is the **1.0.0 stable release**. The API is intentionally small, and the binary contracts are treated as explicit infrastructure: changes to representation semantics should be made deliberately, documented, and protected by tests.
+This is the **0.1.0-alpha.3 prerelease**. The API is intentionally small, and the binary contracts are treated as explicit infrastructure: changes to representation semantics should be made deliberately, documented, and protected by tests.
 
 ---
 
@@ -118,18 +118,18 @@ The point is to provide a **small representation boundary** that higher-level sy
 ### .NET CLI
 
 ~~~bash
-dotnet add package TheSingularityWorkshop.FSM_Serialization --version 1.0.0
+dotnet add package TheSingularityWorkshop.FSM_Serialization --version 0.1.0-alpha.3
 ~~~
 
 ### PackageReference
 
 ~~~xml
-<PackageReference Include="TheSingularityWorkshop.FSM_Serialization" Version="1.0.0" />
+<PackageReference Include="TheSingularityWorkshop.FSM_Serialization" Version="0.1.0-alpha.3" />
 ~~~
 
 The package is available from [NuGet.org](https://www.nuget.org/packages/TheSingularityWorkshop.FSM_Serialization/).
 
-> **Stable release:** `1.0.0` establishes the first stable public package contract. Future releases that change binary representation semantics should document the compatibility implications and increment the package version accordingly.
+> **Prerelease:** `0.1.0-alpha.3` is the current reviewable package line. The intended `1.0.0` stable release remains a separate release decision after final review.
 
 ---
 
@@ -967,9 +967,9 @@ The theory covers:
 
 # Project status
 
-**Current status: Stable (1.0.0)**
+**Current status: Alpha (`0.1.0-alpha.3`)**
 
-The package is intentionally small and is being established as reusable infrastructure for the broader FSM ecosystem.
+The package is intentionally small and is being prepared as reusable infrastructure for the broader FSM ecosystem.
 
 The current release establishes the primitive binary boundary:
 
