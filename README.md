@@ -814,6 +814,26 @@ These numbers are **environment-specific measurements, not guarantees**. Future 
 
 ---
 
+## Benchmark source and methodology
+
+The published performance section above is backed by the executable **[FSM_Serialization_Benchmarks](https://github.com/TrentBest/FSM_Serialization_Benchmarks)** project.
+
+The benchmark source is intentionally separate from the package so readers can inspect the experiment itself.
+
+When reading the benchmark, look for:
+
+- `[MemoryDiagnoser]` — allocation measurements;
+- `[SimpleJob(RuntimeMoniker.Net80)]` — explicit .NET runtime;
+- `[Params(...)]` — payload sizes;
+- `[Benchmark(Baseline = true)]` — the local `MemoryStream` comparison;
+- `[Benchmark]` — the Workshop implementation under test.
+
+The first benchmark pass targeted package version `0.1.0-alpha.2`. Its results are historical evidence tied to that implementation and environment.
+
+The benchmark's most important lesson is methodological: the large cost seen in the existing-data `MemoryBinaryStream(byte[])` path is substantially a **copying cost**, because the BCL comparison can wrap the original array while the current Workshop constructor copies it.
+
+For a reader-friendly explanation of the experiment, the interpretation of the numbers, and reproduction instructions, see **[docs/BENCHMARKING.md](docs/BENCHMARKING.md)**.
+
 # Testing
 
 The repository includes an xUnit test project covering the current contracts and adapters.
