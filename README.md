@@ -158,88 +158,6 @@ Expected output:
 
 The stream provides the byte-level mechanism. `ExampleState` defines which value is represented and its little-endian format.
 
-# Example: Pack and unpack a value
-
-A type defines its own binary representation.
-
-The following example stores one 32-bit integer:
-
-~~~csharp
-using System.Buffers.Binary;
-using TheSingularityWorkshop.FSM_Serialization;
-
-public sealed class ExampleState : IBinarySerializable
-{
-    public int Value { get; private set; }
-
-    public ExampleState()
-    {
-    }
-
-    public ExampleState(int value)
-    {
-        Value = value;
-    }
-
-    public void Pack(IBinaryStream stream)
-    {
-        Span<byte> buffer = stackalloc byte[sizeof(int)];
-        BinaryPrimitives.WriteInt32LittleEndian(buffer, Value);
-        stream.Write(buffer);
-    }
-
-    public void Unpack(IBinaryStream stream)
-    {
-        Span<byte> buffer = stackalloc byte[sizeof(int)];
-
-        if (stream.Read(buffer) != buffer.Length)
-            throw new EndOfStreamException();
-
-        Value = BinaryPrimitives.ReadInt32LittleEndian(buffer);
-    }
-}
-~~~
-
-A round trip is then straightforward:
-
-~~~csharp
-using var stream = new MemoryBinaryStream();
-
-var original = new ExampleState(42);
-
-original.Pack(stream);
-
-stream.Position = 0;
-
-var restored = new ExampleState();
-
-restored.Unpack(stream);
-
-Console.WriteLine(restored.Value); // 42
-~~~
-
-The important part is not the integer.
-
-The important part is the ownership boundary:
-
-~~~text
-ExampleState
-    │
-    │ defines representation
-    ▼
-Pack / Unpack
-    │
-    ▼
-IBinaryStream
-    │
-    ▼
-bytes
-~~~
-
-FSM_Serialization supplies the last boundary. ExampleState supplies the meaning.
-
----
-
 ## Add It to an Existing Project
 
 Already have an application? Add the package to the project that owns the type whose representation you want to control:
@@ -285,7 +203,7 @@ The package intentionally has no dependency on an application host, database, fi
 
 ---
 
-# Core API
+# # Core API
 
 The public surface is deliberately small.
 
@@ -402,7 +320,7 @@ The package does not require every type to implement it.
 
 ---
 
-# Stream implementations
+# # Stream implementations
 
 ## MemoryBinaryStream
 
@@ -468,7 +386,7 @@ If a host requires different lifetime semantics, that policy belongs to a future
 
 ---
 
-# Designing a binary representation
+# # Designing a binary representation
 
 FSM_Serialization deliberately leaves format design to the type that owns the data.
 
@@ -503,7 +421,7 @@ FSM_Serialization provides the mechanism for writing and reading those bytes. It
 
 ---
 
-# Determinism
+# # Determinism
 
 A binary representation can be deterministic, but the package does not automatically make arbitrary objects deterministic.
 
@@ -546,7 +464,7 @@ The package does not pretend that Pack alone guarantees any of those properties.
 
 ---
 
-# Round-trip semantics
+# # Round-trip semantics
 
 The fundamental operation is a semantic round trip:
 
@@ -574,7 +492,7 @@ A serializer should not be judged by whether it reproduces an object graph's inc
 
 ---
 
-# Versioning and compatibility
+# # Versioning and compatibility
 
 Binary formats are contracts.
 
@@ -605,7 +523,7 @@ FSM_Serialization provides the byte boundary. It does not impose a versioning sc
 
 ---
 
-# Storage is not serialization
+# # Storage is not serialization
 
 A common architectural mistake is allowing serialization code to absorb storage concerns.
 
@@ -637,7 +555,7 @@ A database, filesystem, cache, object store, HTTP service, message bus, or netwo
 
 ---
 
-# Representation is not reality
+# # Representation is not reality
 
 The package follows a broader architectural principle used throughout The Singularity Workshop ecosystem:
 
@@ -669,7 +587,7 @@ Keeping that distinction explicit prevents representation mechanics from becomin
 
 ---
 
-# Relationship to the FSM ecosystem
+# # Relationship to the FSM ecosystem
 
 FSM_Serialization is intended to sit below higher-level FSM composition and host systems.
 
@@ -699,7 +617,7 @@ A conceptual architecture is:
                     ▼
               host / runtime
                     │
-          WebPage / Unity / Desktop
+          WebPage / Desktop / Other host
 ~~~
 
 The exact dependency graph can evolve.
@@ -720,7 +638,7 @@ FSM_Serialization should remain below application-specific manifestation.
 
 ---
 
-# MicroBundles and manifests
+# # MicroBundles and manifests
 
 The package is intentionally compatible with the broader idea of representing an Experience as a composition rather than as one giant application-specific object graph.
 
@@ -750,7 +668,7 @@ The package supplies the low-level representation boundary through which a highe
 
 ---
 
-# What belongs in this package?
+# # What belongs in this package?
 
 Good candidates include:
 
@@ -768,7 +686,7 @@ If yes, it may belong here.
 
 ---
 
-# What does not belong here?
+# # What does not belong here?
 
 This package should not become:
 
@@ -777,7 +695,7 @@ This package should not become:
 - an AEC model;
 - a GUI framework;
 - a browser framework;
-- a Unity integration layer;
+- a platform-specific integration layer;
 - a database abstraction;
 - a filesystem framework;
 - an HTTP client;
@@ -791,7 +709,7 @@ Those systems can **use** FSM_Serialization. They should not be forced into it.
 
 ---
 
-# Explicit design trade-offs
+# # Explicit design trade-offs
 
 ### Benefits
 
@@ -820,7 +738,7 @@ These are deliberate trade-offs rather than missing features.
 ---
 
 
-# Performance
+# # Performance
 
 The published **0.1.0-alpha.2** package was benchmarked through the companion **FSM_Serialization_Benchmarks** project using BenchmarkDotNet 0.15.2 on .NET 8.0.31, running on an Intel Core i5-10400F (6 physical / 12 logical cores) with RyuJIT AVX2. The benchmark suite exercised sizes of **16, 1,024, 10,000, and 100,000 bytes**.
 
@@ -874,7 +792,7 @@ These numbers are **environment-specific measurements, not guarantees**. Future 
 
 ---
 
-# Testing
+# # Testing
 
 The repository includes an xUnit test project covering the current contracts and adapters.
 
@@ -901,7 +819,7 @@ The repository verification workflow collects Cobertura coverage and uploads the
 
 ---
 
-# Continuous integration and publication
+# # Continuous integration and publication
 
 The repository uses GitHub Actions through **.github/workflows/verify.yml**.
 
@@ -940,7 +858,7 @@ A successful build does not silently publish a package.
 
 ---
 
-# Package contents
+# # Package contents
 
 The package is built from the root project **TheSingularityWorkshop.FSM_Serialization.csproj**.
 
@@ -956,7 +874,7 @@ Build output and local artifacts are excluded from source control.
 
 ---
 
-# Repository structure
+# # Repository structure
 
 ~~~text
 TheSingularityWorkshop.FSM_Serialization/
@@ -991,7 +909,7 @@ The implementation project is intentionally small and the tests live beside the 
 
 ---
 
-# Documentation map
+# # Documentation map
 
 This repository has two complementary documentation layers.
 
@@ -1025,7 +943,7 @@ The theory covers:
 
 ---
 
-# Project status
+# # Project status
 
 **Current status: Stable (1.0.0)**
 
@@ -1047,7 +965,7 @@ Higher-level serializers, schemas, manifests, and domain-specific representation
 
 ---
 
-# Contributing and evolution
+# # Contributing and evolution
 
 When changing this package, preserve the following invariants:
 
@@ -1081,7 +999,7 @@ Binary is the current concrete representation boundary. It should not become an 
 
 ---
 
-# License
+# # License
 
 This project is licensed under the MIT License.
 
@@ -1089,7 +1007,7 @@ See [LICENSE.txt](LICENSE.txt).
 
 ---
 
-# The Singularity Workshop
+# # The Singularity Workshop
 
 **TheSingularityWorkshop.FSM_Serialization** is part of The Singularity Workshop ecosystem.
 
@@ -1133,7 +1051,6 @@ Everything else should have to earn its way into a higher-level layer.
 
 ### 📦 Get FSM_API
 
-- **Unity Asset Store:** [FSM_API for Unity](https://assetstore.unity.com/packages/slug/332450)
 - **Core NuGet:** [TheSingularityWorkshop.FSM_API](https://www.nuget.org/packages/TheSingularityWorkshop.FSM_API)
 - **Source Code:** [TheSingularityWorkshop.FSM_Serialization on GitHub](https://github.com/TrentBest/TheSingularityWorkshop.FSM_Serialization)
 - **This Package:** [TheSingularityWorkshop.FSM_Serialization](https://www.nuget.org/packages/TheSingularityWorkshop.FSM_Serialization)
@@ -1165,6 +1082,5 @@ This project is part of a deliberately troublesome ecosystem:
 - **[FSM_COS](https://github.com/TrentBest/TheSingularityWorkshop.FSM_COS)** — composition and runtime assembly.
 - **[FSM_Serialization](https://github.com/TrentBest/TheSingularityWorkshop.FSM_Serialization)** — representation and the byte boundary.
 - **[WebPage](https://github.com/TrentBest/WebPage)** — browser manifestation and proving ground.
-- **[FSM_API_Unity](https://github.com/TrentBest/FSM_API_Unity)** — Unity manifestation.
 
 <p align="center"><em>The Singularity Workshop — Tools for the curious, the bold, and the systemically inclined.</em><br><strong>Because state shouldn't be a mess.</strong><br><em>And because static boundaries are invitations to cause trouble.</em></p>
