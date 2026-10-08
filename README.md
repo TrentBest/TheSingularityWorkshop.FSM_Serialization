@@ -203,7 +203,7 @@ The package intentionally has no dependency on an application host, database, fi
 
 ---
 
-# # Core API
+## Core API
 
 The public surface is deliberately small.
 
@@ -320,7 +320,7 @@ The package does not require every type to implement it.
 
 ---
 
-# # Stream implementations
+## Stream implementations
 
 ## MemoryBinaryStream
 
@@ -386,7 +386,7 @@ If a host requires different lifetime semantics, that policy belongs to a future
 
 ---
 
-# # Designing a binary representation
+## Designing a binary representation
 
 FSM_Serialization deliberately leaves format design to the type that owns the data.
 
@@ -421,7 +421,7 @@ FSM_Serialization provides the mechanism for writing and reading those bytes. It
 
 ---
 
-# # Determinism
+## Determinism
 
 A binary representation can be deterministic, but the package does not automatically make arbitrary objects deterministic.
 
@@ -464,7 +464,7 @@ The package does not pretend that Pack alone guarantees any of those properties.
 
 ---
 
-# # Round-trip semantics
+## Round-trip semantics
 
 The fundamental operation is a semantic round trip:
 
@@ -492,7 +492,7 @@ A serializer should not be judged by whether it reproduces an object graph's inc
 
 ---
 
-# # Versioning and compatibility
+## Versioning and compatibility
 
 Binary formats are contracts.
 
@@ -523,7 +523,7 @@ FSM_Serialization provides the byte boundary. It does not impose a versioning sc
 
 ---
 
-# # Storage is not serialization
+## Storage is not serialization
 
 A common architectural mistake is allowing serialization code to absorb storage concerns.
 
@@ -555,7 +555,7 @@ A database, filesystem, cache, object store, HTTP service, message bus, or netwo
 
 ---
 
-# # Representation is not reality
+## Representation is not reality
 
 The package follows a broader architectural principle used throughout The Singularity Workshop ecosystem:
 
@@ -587,7 +587,7 @@ Keeping that distinction explicit prevents representation mechanics from becomin
 
 ---
 
-# # Relationship to the FSM ecosystem
+## Relationship to the FSM ecosystem
 
 FSM_Serialization is intended to sit below higher-level FSM composition and host systems.
 
@@ -638,7 +638,7 @@ FSM_Serialization should remain below application-specific manifestation.
 
 ---
 
-# # MicroBundles and manifests
+## MicroBundles and manifests
 
 The package is intentionally compatible with the broader idea of representing an Experience as a composition rather than as one giant application-specific object graph.
 
@@ -668,7 +668,7 @@ The package supplies the low-level representation boundary through which a highe
 
 ---
 
-# # What belongs in this package?
+## What belongs in this package?
 
 Good candidates include:
 
@@ -686,7 +686,7 @@ If yes, it may belong here.
 
 ---
 
-# # What does not belong here?
+## What does not belong here?
 
 This package should not become:
 
@@ -709,7 +709,7 @@ Those systems can **use** FSM_Serialization. They should not be forced into it.
 
 ---
 
-# # Explicit design trade-offs
+## Explicit design trade-offs
 
 ### Benefits
 
@@ -738,7 +738,7 @@ These are deliberate trade-offs rather than missing features.
 ---
 
 
-# # Performance
+## Performance
 
 The published **0.1.0-alpha.2** package was benchmarked through the companion **FSM_Serialization_Benchmarks** project using BenchmarkDotNet 0.15.2 on .NET 8.0.31, running on an Intel Core i5-10400F (6 physical / 12 logical cores) with RyuJIT AVX2. The benchmark suite exercised sizes of **16, 1,024, 10,000, and 100,000 bytes**.
 
@@ -792,7 +792,7 @@ These numbers are **environment-specific measurements, not guarantees**. Future 
 
 ---
 
-# # Testing
+## Testing
 
 The repository includes an xUnit test project covering the current contracts and adapters.
 
@@ -819,7 +819,7 @@ The repository verification workflow collects Cobertura coverage and uploads the
 
 ---
 
-# # Continuous integration and publication
+## Continuous integration and publication
 
 The repository uses GitHub Actions through **.github/workflows/verify.yml**.
 
@@ -858,7 +858,7 @@ A successful build does not silently publish a package.
 
 ---
 
-# # Package contents
+## Package contents
 
 The package is built from the root project **TheSingularityWorkshop.FSM_Serialization.csproj**.
 
@@ -874,7 +874,7 @@ Build output and local artifacts are excluded from source control.
 
 ---
 
-# # Repository structure
+## Repository structure
 
 ~~~text
 TheSingularityWorkshop.FSM_Serialization/
@@ -909,7 +909,7 @@ The implementation project is intentionally small and the tests live beside the 
 
 ---
 
-# # Documentation map
+## Documentation map
 
 This repository has two complementary documentation layers.
 
@@ -943,7 +943,7 @@ The theory covers:
 
 ---
 
-# # Project status
+## Project status
 
 **Current status: Stable (1.0.0)**
 
@@ -965,7 +965,7 @@ Higher-level serializers, schemas, manifests, and domain-specific representation
 
 ---
 
-# # Contributing and evolution
+## Contributing and evolution
 
 When changing this package, preserve the following invariants:
 
@@ -999,7 +999,7 @@ Binary is the current concrete representation boundary. It should not become an 
 
 ---
 
-# # License
+## License
 
 This project is licensed under the MIT License.
 
@@ -1007,7 +1007,7 @@ See [LICENSE.txt](LICENSE.txt).
 
 ---
 
-# # The Singularity Workshop
+## The Singularity Workshop
 
 **TheSingularityWorkshop.FSM_Serialization** is part of The Singularity Workshop ecosystem.
 
