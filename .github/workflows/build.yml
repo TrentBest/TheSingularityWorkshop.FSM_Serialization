@@ -1,9 +1,11 @@
-name: Package FSM Serialization
+name: Build, test, and package fsm-serialization
 
 on:
   push:
     branches:
       - master
+      - development
+  pull_request:
   workflow_dispatch:
 
 permissions:
@@ -43,7 +45,6 @@ jobs:
             exit 1
           fi
           cp "$coverage_file" ./TestResults/coverage.cobertura.xml
-          echo "Prepared coverage report: $coverage_file"
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v6
         with:
@@ -66,7 +67,7 @@ jobs:
   publish_nuget:
     needs: build-and-test
     runs-on: ubuntu-24.04
-    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+    if: ${{ github.event_name == 'workflow_dispatch' && false }}
     permissions:
       contents: read
       id-token: write
