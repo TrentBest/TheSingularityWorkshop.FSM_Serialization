@@ -27,7 +27,7 @@ The type that owns meaning should own its representation rules. This package pro
 
 ## 🟣 02 Why
 
-The package makes this boundary explicit so applications can compose the capability without coupling unrelated responsibilities. It should remain a small, honest contract: no hidden provider, host, or runtime behavior is implied unless the implementation and tests demonstrate it.
+Binary representation is a boundary, not a license for a generic serializer to take ownership of every type's meaning. Explicit contracts keep the byte format accountable to the domain type and make stream behavior and ownership reviewable.
 
 ## 🔺 03 How
 
