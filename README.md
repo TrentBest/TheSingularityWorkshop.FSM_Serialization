@@ -1,3 +1,5 @@
+![The Singularity Workshop animated moniker](https://raw.githubusercontent.com/TrentBest/TheSingularityWorkshop.Renderer/development/docs/assets/moniker.svg)
+
 # TheSingularityWorkshop.FSM_Serialization
 
 [![Verify](https://github.com/TrentBest/TheSingularityWorkshop.FSM_Serialization/actions/workflows/verify.yml/badge.svg)](https://github.com/TrentBest/TheSingularityWorkshop.FSM_Serialization/actions/workflows/verify.yml)
@@ -5,6 +7,43 @@
 [![NuGet](https://img.shields.io/nuget/v/TheSingularityWorkshop.FSM_Serialization.svg)](https://www.nuget.org/packages/TheSingularityWorkshop.FSM_Serialization/)
 [![NuGet Downloads](https://img.shields.io/nuget/dt/TheSingularityWorkshop.FSM_Serialization.svg)](https://www.nuget.org/packages/TheSingularityWorkshop.FSM_Serialization/)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE.txt)
+
+
+> **A small, explicit binary representation boundary for Workshop-owned state.**
+
+The type that owns meaning should own its representation rules. This package provides byte-oriented contracts and stream adapters without turning into a general-purpose object-graph serializer or persistence framework.
+
+```mermaid
+flowchart TD
+  D[Domain-owned state] --> P[Binary representation contract]
+  P --> S[Stream adapter]
+  S --> B[Bytes]
+  B --> R[Domain-owned reconstruction]
+```
+
+## 🟦 01 What
+
+The type that owns meaning should own its representation rules. This package provides byte-oriented contracts and stream adapters without turning into a general-purpose object-graph serializer or persistence framework.
+
+## 🟣 02 Why
+
+The package makes this boundary explicit so applications can compose the capability without coupling unrelated responsibilities. It should remain a small, honest contract: no hidden provider, host, or runtime behavior is implied unless the implementation and tests demonstrate it.
+
+## 🔺 03 How
+
+Choose the representation in the domain-owned type, then use the package's binary interfaces and stream implementations to cross the byte boundary explicitly.
+
+## 🟢 04 See it in a minute
+
+Use the Quick start below after installing the package; then run the tests to inspect the defined read/write behavior and stream ownership rules.
+
+## 🟪 05 Documentation and theory
+
+[Quick start](#quick-start) · [Core API](#core-api) · [Stream implementations](#stream-implementations)
+
+---
+
+## Detailed guide
 
 ![FSM Serialization — The Binary Boundary](docs/images/fsm-serialization-01-boundary.jpg)
 
