@@ -6,6 +6,12 @@ on:
       - master
       - development
   workflow_dispatch:
+    inputs:
+      publish:
+        description: 'Publish the verified package to NuGet.org'
+        required: true
+        default: false
+        type: boolean
 
 permissions:
   contents: read
@@ -67,7 +73,7 @@ jobs:
   publish_nuget:
     needs: build-and-test
     runs-on: ubuntu-24.04
-    if: ${{ (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && false }}
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.publish == true && github.ref == 'refs/heads/development' }}
     permissions:
       contents: read
       id-token: write
