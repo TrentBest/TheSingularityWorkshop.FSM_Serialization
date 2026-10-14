@@ -5,7 +5,7 @@
   </a>
 </p>
 
-# TheSingularityWorkshop.FSM_Serialization
+# ✳️ 00 TheSingularityWorkshop.FSM_Serialization
 
 [![Verify](https://github.com/TrentBest/TheSingularityWorkshop.FSM_Serialization/actions/workflows/verify.yml/badge.svg)](https://github.com/TrentBest/TheSingularityWorkshop.FSM_Serialization/actions/workflows/verify.yml)
 [![codecov](https://codecov.io/gh/TrentBest/TheSingularityWorkshop.FSM_Serialization/graph/badge.svg)](https://codecov.io/gh/TrentBest/TheSingularityWorkshop.FSM_Serialization)
