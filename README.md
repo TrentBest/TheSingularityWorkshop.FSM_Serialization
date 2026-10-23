@@ -2,7 +2,7 @@
 
 # TheSingularityWorkshop.FSM_Serialization
 
-[![Verify](https://github.com/TrentBest/TheSingularityWorkshop.FSM_Serialization/actions/workflows/verify.yml/badge.svg)](https://github.com/TrentBest/TheSingularityWorkshop.FSM_Serialization/actions/workflows/verify.yml)
+[![Verify](https://github.com/TrentBest/TheSingularityWorkshop.FSM_Serialization/actions/workflows/build.yml/badge.svg)](https://github.com/TrentBest/TheSingularityWorkshop.FSM_Serialization/actions/workflows/build.yml)
 [![codecov](https://codecov.io/gh/TrentBest/TheSingularityWorkshop.FSM_Serialization/graph/badge.svg)](https://codecov.io/gh/TrentBest/TheSingularityWorkshop.FSM_Serialization)
 [![NuGet](https://img.shields.io/nuget/v/TheSingularityWorkshop.FSM_Serialization.svg)](https://www.nuget.org/packages/TheSingularityWorkshop.FSM_Serialization/)
 [![NuGet Downloads](https://img.shields.io/nuget/dt/TheSingularityWorkshop.FSM_Serialization.svg)](https://www.nuget.org/packages/TheSingularityWorkshop.FSM_Serialization/)
@@ -40,6 +40,19 @@ Use the Quick start below after installing the package; then run the tests to in
 ## 🟪 05 Documentation and theory
 
 [Quick start](#quick-start) · [Core API](#core-api) · [Stream implementations](#stream-implementations)
+
+[Gallery and living diagrams](Gallery.md) · [Animated byte operations](docs/BYTE_OPERATIONS.md) · [UML class cards](docs/UML/README.md) · [Benchmarking](docs/BENCHMARKING.md)
+
+### Watch the two directions
+
+**Pack:** domain-owned meaning becomes an explicit byte sequence.
+
+![Animated packing flow](docs/images/packing-flow.svg)
+
+**Unpack:** a byte sequence is read and interpreted back into domain-owned state.
+
+![Animated unpacking flow](docs/images/unpacking-flow.svg)
+
 
 ---
 
