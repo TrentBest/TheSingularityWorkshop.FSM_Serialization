@@ -37,4 +37,4 @@ PRs [#2](https://github.com/TrentBest/TheSingularityWorkshop.FSM_Serialization/p
 
 **Branch target:** `master` + `development` only.  
 **Package publication:** not performed or authorized by this work.  
-**Readiness estimate:** 65% — baseline CI passed and the actual package was inspected. Artifact inspection exposed two packaging defects; their fix is committed and CI is running. Remaining: verify corrected package contents, finish API/edge-case and compatibility review, decide version metadata, and make the final branch handoff.
+**Readiness estimate:** 70% — source-backed domain inventory, focused UML coverage, companion-doc packaging, package artifact inspection, and a 1.0.1 candidate version are in place. The 1.0.1 artifact and latest CI still need verification; final API/edge review and manual branch handoff remain.
