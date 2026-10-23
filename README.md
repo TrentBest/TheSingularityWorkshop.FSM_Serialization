@@ -35,7 +35,7 @@ Choose the representation in the domain-owned type, then use the package's binar
 
 ## 🟢 04 See it in a minute
 
-Use the complete console-app walkthrough below to pack and unpack a value with the published 1.0.0 package.
+Use the complete console-app walkthrough below to pack and unpack a value with the planned 1.0.1 documentation-led patch release.
 
 ## 60-Second Quick Start
 
@@ -52,7 +52,7 @@ Choose **View → Terminal** and make sure it is in the directory containing you
 ### 3. Install the published package
 
 ```powershell
-dotnet add package TheSingularityWorkshop.FSM_Serialization --version 1.0.0
+dotnet add package TheSingularityWorkshop.FSM_Serialization --version 1.0.1
 ```
 
 ### 4. Replace `Program.cs` with this complete example
@@ -110,7 +110,7 @@ The stream provides the byte-level mechanism. `ExampleState` defines which value
 Already have an application? Add the package to the project that owns the type whose representation you want to control:
 
 ```powershell
-dotnet add package TheSingularityWorkshop.FSM_Serialization --version 1.0.0
+dotnet add package TheSingularityWorkshop.FSM_Serialization --version 1.0.1
 ```
 
 Implement `IBinarySerializable` (or the narrower pack/unpack contract appropriate to your use) on the domain-owned type, then pass an `IBinaryStream` supplied by the package. Keep the field order, widths, byte order, string encoding, and versioning rules in the type or domain contract that owns the data.
@@ -155,7 +155,7 @@ It deliberately does **not** attempt to become a general-purpose object graph se
 | Property | Value |
 |---|---|
 | Package | **TheSingularityWorkshop.FSM_Serialization** |
-| Current version | **1.0.0** |
+| Candidate version | **1.0.1** (documentation and package-content update; not yet published) |
 | Target framework | .NET 8 |
 | Language | C# |
 | License | MIT |
@@ -164,7 +164,7 @@ It deliberately does **not** attempt to become a general-purpose object graph se
 | Coverage | [Codecov](https://codecov.io/gh/TrentBest/TheSingularityWorkshop.FSM_Serialization) |
 | CI | GitHub Actions |
 
-This is the **1.0.0 stable release**. The API is intentionally small, and the binary contracts are treated as explicit infrastructure: changes to representation semantics should be made deliberately, documented, and protected by tests.
+The published baseline is **1.0.0**; the current development candidate is **1.0.1**. This patch is intended to improve documentation and packaged guides without changing the public API or binary contract. Publication remains gated on final review and explicit approval.
 
 ---
 
@@ -250,13 +250,13 @@ The point is to provide a **small representation boundary** that higher-level sy
 ### .NET CLI
 
 ~~~bash
-dotnet add package TheSingularityWorkshop.FSM_Serialization --version 1.0.0
+dotnet add package TheSingularityWorkshop.FSM_Serialization --version 1.0.1
 ~~~
 
 ### PackageReference
 
 ~~~xml
-<PackageReference Include="TheSingularityWorkshop.FSM_Serialization" Version="1.0.0" />
+<PackageReference Include="TheSingularityWorkshop.FSM_Serialization" Version="1.0.1" />
 ~~~
 
 The package is available from [NuGet.org](https://www.nuget.org/packages/TheSingularityWorkshop.FSM_Serialization/).
@@ -1037,7 +1037,7 @@ The theory covers:
 
 # Project status
 
-**Current status: Stable (1.0.0)**
+**Current status: 1.0.1 candidate (not yet published)**
 
 The package is intentionally small and is being established as reusable infrastructure for the broader FSM ecosystem.
 
