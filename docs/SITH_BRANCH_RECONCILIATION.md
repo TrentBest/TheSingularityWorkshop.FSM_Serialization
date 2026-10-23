@@ -21,6 +21,10 @@
 - Companion Markdown class cards beside all six source files.
 - Tutorial-first README, theory cleanup, benchmark guide, fixed CI badge, and pull-request CI trigger.
 
+## PR and branch disposition
+
+PRs [#2](https://github.com/TrentBest/TheSingularityWorkshop.FSM_Serialization/pull/2), [#3](https://github.com/TrentBest/TheSingularityWorkshop.FSM_Serialization/pull/3), [#4](https://github.com/TrentBest/TheSingularityWorkshop.FSM_Serialization/pull/4), and [#5](https://github.com/TrentBest/TheSingularityWorkshop.FSM_Serialization/pull/5) are now **closed as superseded**, with a reconciliation comment on each. Their unique work has been copied or replaced by the active implementation on `development`. The four surplus branch refs still exist intentionally; they are not deleted by this workflow.
+
 ## Remaining reconciliation checks
 
 - Inspect CI after the workflow change and confirm build, tests, coverage, and pack succeed.
