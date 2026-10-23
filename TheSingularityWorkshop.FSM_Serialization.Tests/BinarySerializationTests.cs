@@ -56,6 +56,17 @@ public sealed class BinarySerializationTests
     }
 
     [Fact]
+    public void MemoryBinaryStreamCopiesInitialData()
+    {
+        byte[] input = [1, 2, 3];
+        using var stream = new MemoryBinaryStream(input);
+
+        input[0] = 99;
+
+        Assert.Equal(new byte[] { 1, 2, 3 }, stream.ToArray());
+    }
+
+    [Fact]
     public void MemoryBinaryStreamReturnsZeroAtEndOfInput()
     {
         using var stream = new MemoryBinaryStream([1, 2]);
@@ -96,6 +107,17 @@ public sealed class BinarySerializationTests
     public void StreamBinaryStreamRejectsNullStream()
     {
         Assert.Throws<ArgumentNullException>(() => new StreamBinaryStream(null!));
+    }
+
+    [Fact]
+    public void StreamBinaryStreamDisposesTheSuppliedStream()
+    {
+        var backing = new TrackingMemoryStream();
+        var stream = new StreamBinaryStream(backing);
+
+        stream.Dispose();
+
+        Assert.True(backing.WasDisposed);
     }
 
     [Fact]
@@ -150,6 +172,17 @@ public sealed class BinarySerializationTests
         var value = new TestValue();
 
         Assert.Throws<EndOfStreamException>(() => value.Unpack(stream));
+    }
+
+    private sealed class TrackingMemoryStream : MemoryStream
+    {
+        public bool WasDisposed { get; private set; }
+
+        protected override void Dispose(bool disposing)
+        {
+            WasDisposed = true;
+            base.Dispose(disposing);
+        }
     }
 
     private sealed class TestValue : IBinarySerializable
