@@ -28,7 +28,8 @@
     <None Include="README.md" Pack="true" PackagePath="" />
     <None Include="LICENSE.txt" Pack="true" PackagePath="" />
     <None Include="Gallery.md" Pack="true" PackagePath="" />
-    <None Include="docs\**\*.md" Pack="true" PackagePath="%(Identity)" />
+    <None Include="docs\**\*.md" Exclude="docs\SITH_BRANCH_RECONCILIATION.md" Pack="true" PackagePath="%(Identity)" />
+    <None Include="src\**\*.md" Pack="true" PackagePath="%(Identity)" />
     <None Include="docs\images\**\*" Pack="true" PackagePath="docs\images\" />
   </ItemGroup>
 
