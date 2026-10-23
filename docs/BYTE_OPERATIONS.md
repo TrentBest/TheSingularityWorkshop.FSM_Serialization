@@ -58,4 +58,4 @@ These are not universal features automatically supplied by FSM_Serialization. Th
 
 ## Source-backed proof
 
-The current test suite exercises memory-stream initialization, read/write round trips, seeking and overwriting, adapter delegation, null arguments, a successful integer round trip, and truncated input. It is a useful baseline—not a claim that every listed format concern is already implemented or tested.
+The current test suite exercises memory-stream initialization and copying, read/write round trips, seeking and overwriting, adapter capability/byte/position delegation, short reads, wrapped-stream disposal, null arguments, a successful integer round trip, and truncated input. CI currently reports 17 tests passing with no failures; verify the latest workflow artifact before relying on that count. This is evidence for the current API—not a claim that every listed format concern is implemented or tested.
