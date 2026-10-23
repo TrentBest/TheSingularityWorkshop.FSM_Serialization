@@ -29,7 +29,7 @@ PRs [#2](https://github.com/TrentBest/TheSingularityWorkshop.FSM_Serialization/p
 
 - Inspect CI after the workflow change and confirm build, tests, coverage, and pack succeed.
 - Verify animated SVGs render in GitHub and in a browser; keep them explanatory, not a substitute for tests.
-- Verify CI for the new ownership/disposal tests and package-content changes; inspect the packed `.nupkg` contents rather than assuming MSBuild metadata behaved as intended.
+- Verified CI run [39903818354](https://github.com/TrentBest/TheSingularityWorkshop.FSM_Serialization/actions/runs/39903818354) passed all 15 tests (15 passed, 0 failed), coverage collection, and packing. Inspected its actual `.nupkg`: root Gallery/README and guide/UML/diagram files were present, but source-adjacent `src/*.md` companion cards were missing and the internal Sith ledger was being packaged. The next commit corrects both: include `src/**/*.md`, exclude `docs/SITH_BRANCH_RECONCILIATION.md`. Verify the resulting artifact after CI finishes.
 - Audit the complete public API, stream edge cases, test coverage, package contents, and current release metadata.
 - Confirm the active `build.yml` publish gate and trusted-publishing configuration against the intended release procedure.
 - Confirm each open PR is either merged or closed as superseded only after its unique content is present on `development`.
@@ -37,4 +37,4 @@ PRs [#2](https://github.com/TrentBest/TheSingularityWorkshop.FSM_Serialization/p
 
 **Branch target:** `master` + `development` only.  
 **Package publication:** not performed or authorized by this work.  
-**Readiness estimate:** 60% — documentation and branch reconciliation are substantially advanced; API/edge-case audit, package artifact inspection, final CI, and release metadata/version decision remain.
+**Readiness estimate:** 65% — baseline CI passed and the actual package was inspected. Artifact inspection exposed two packaging defects; their fix is committed and CI is running. Remaining: verify corrected package contents, finish API/edge-case and compatibility review, decide version metadata, and make the final branch handoff.
