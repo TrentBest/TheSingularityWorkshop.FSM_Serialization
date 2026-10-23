@@ -35,11 +35,91 @@ Choose the representation in the domain-owned type, then use the package's binar
 
 ## 🟢 04 See it in a minute
 
-Use the Quick start below after installing the package; then run the tests to inspect the defined read/write behavior and stream ownership rules.
+Use the complete console-app walkthrough below to pack and unpack a value with the published 1.0.0 package.
+
+## 60-Second Quick Start
+
+This example writes a 32-bit integer to a memory stream and reads it back. It demonstrates the byte boundary; your domain type still owns the format.
+
+### 1. Create a project in Visual Studio
+
+Choose **Create a new project → Console App**, select C#, and target **.NET 8**.
+
+### 2. Open the Developer Terminal
+
+Choose **View → Terminal** and make sure it is in the directory containing your project's `.csproj` file.
+
+### 3. Install the published package
+
+```powershell
+dotnet add package TheSingularityWorkshop.FSM_Serialization --version 1.0.0
+```
+
+### 4. Replace `Program.cs` with this complete example
+
+```csharp
+using System.Buffers.Binary;
+using TheSingularityWorkshop.FSM_Serialization;
+
+using var stream = new MemoryBinaryStream();
+var original = new ExampleState(42);
+original.Pack(stream);
+
+stream.Position = 0;
+
+var restored = new ExampleState();
+restored.Unpack(stream);
+
+Console.WriteLine(restored.Value);
+
+public sealed class ExampleState : IBinarySerializable
+{
+    public int Value { get; private set; }
+
+    public ExampleState() { }
+    public ExampleState(int value) => Value = value;
+
+    public void Pack(IBinaryStream stream)
+    {
+        Span<byte> buffer = stackalloc byte[sizeof(int)];
+        BinaryPrimitives.WriteInt32LittleEndian(buffer, Value);
+        stream.Write(buffer);
+    }
+
+    public void Unpack(IBinaryStream stream)
+    {
+        Span<byte> buffer = stackalloc byte[sizeof(int)];
+        if (stream.Read(buffer) != buffer.Length)
+            throw new EndOfStreamException();
+
+        Value = BinaryPrimitives.ReadInt32LittleEndian(buffer);
+    }
+}
+```
+
+Expected output:
+
+```text
+42
+```
+
+The stream provides the byte-level mechanism. `ExampleState` defines which value is represented and its little-endian format.
+
+## Add It to an Existing Project
+
+Already have an application? Add the package to the project that owns the type whose representation you want to control:
+
+```powershell
+dotnet add package TheSingularityWorkshop.FSM_Serialization --version 1.0.0
+```
+
+Implement `IBinarySerializable` (or the narrower pack/unpack contract appropriate to your use) on the domain-owned type, then pass an `IBinaryStream` supplied by the package. Keep the field order, widths, byte order, string encoding, and versioning rules in the type or domain contract that owns the data.
+
+FSM_Serialization does not decide when to save, where to store bytes, how to transport them, or what a field means. Your existing persistence, storage, transport, and application layers remain yours.
 
 ## 🟪 05 Documentation and theory
 
-[Quick start](#quick-start) · [Core API](#core-api) · [Stream implementations](#stream-implementations)
+[60-second quick start](#60-second-quick-start) · [Core API](#core-api) · [Stream implementations](#stream-implementations) · [Gallery](Gallery.md) · [Byte operations](docs/BYTE_OPERATIONS.md) · [UML](docs/UML/README.md) · [Benchmarking](docs/BENCHMARKING.md)
 
 [Gallery and living diagrams](Gallery.md) · [Animated byte operations](docs/BYTE_OPERATIONS.md) · [UML class cards](docs/UML/README.md) · [Benchmarking](docs/BENCHMARKING.md)
 
@@ -375,88 +455,6 @@ The current adapter owns the wrapped Stream.
 Disposing StreamBinaryStream disposes the underlying .NET stream.
 
 If a host requires different lifetime semantics, that policy belongs to a future adapter or a higher-level abstraction rather than being silently assumed by the current implementation.
-
----
-
-# Quick start
-
-A type defines its own binary representation.
-
-The following example stores one 32-bit integer:
-
-~~~csharp
-using System.Buffers.Binary;
-using TheSingularityWorkshop.FSM_Serialization;
-
-public sealed class ExampleState : IBinarySerializable
-{
-    public int Value { get; private set; }
-
-    public ExampleState()
-    {
-    }
-
-    public ExampleState(int value)
-    {
-        Value = value;
-    }
-
-    public void Pack(IBinaryStream stream)
-    {
-        Span<byte> buffer = stackalloc byte[sizeof(int)];
-        BinaryPrimitives.WriteInt32LittleEndian(buffer, Value);
-        stream.Write(buffer);
-    }
-
-    public void Unpack(IBinaryStream stream)
-    {
-        Span<byte> buffer = stackalloc byte[sizeof(int)];
-
-        if (stream.Read(buffer) != buffer.Length)
-            throw new EndOfStreamException();
-
-        Value = BinaryPrimitives.ReadInt32LittleEndian(buffer);
-    }
-}
-~~~
-
-A round trip is then straightforward:
-
-~~~csharp
-using var stream = new MemoryBinaryStream();
-
-var original = new ExampleState(42);
-
-original.Pack(stream);
-
-stream.Position = 0;
-
-var restored = new ExampleState();
-
-restored.Unpack(stream);
-
-Console.WriteLine(restored.Value); // 42
-~~~
-
-The important part is not the integer.
-
-The important part is the ownership boundary:
-
-~~~text
-ExampleState
-    │
-    │ defines representation
-    ▼
-Pack / Unpack
-    │
-    ▼
-IBinaryStream
-    │
-    ▼
-bytes
-~~~
-
-FSM_Serialization supplies the last boundary. ExampleState supplies the meaning.
 
 ---
 
@@ -1157,7 +1155,6 @@ This project is part of a deliberately troublesome ecosystem:
 - **[FSM_COS](https://github.com/TrentBest/TheSingularityWorkshop.FSM_COS)** — composition and runtime assembly.
 - **[FSM_Serialization](https://github.com/TrentBest/TheSingularityWorkshop.FSM_Serialization)** — representation and the byte boundary.
 - **[WebPage](https://github.com/TrentBest/WebPage)** — browser manifestation and proving ground.
-- **[FSM_API_Unity](https://github.com/TrentBest/FSM_API_Unity)** — Unity manifestation.
 
 <p align="center">
   <a href="https://github.com/TrentBest/WebPage" aria-label="Visit The Singularity Workshop"><img src="https://raw.githubusercontent.com/TrentBest/WebPage/development/TheSingularityWorkshop/wwwroot/Images/TheSingularityWorkshopLivingAvatar.svg" alt="The Singularity Workshop living avatar — a digital vortex of information converging on its central eye" width="112" /></a><br />
