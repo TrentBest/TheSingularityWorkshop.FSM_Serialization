@@ -25,16 +25,15 @@
 
 PRs [#2](https://github.com/TrentBest/TheSingularityWorkshop.FSM_Serialization/pull/2), [#3](https://github.com/TrentBest/TheSingularityWorkshop.FSM_Serialization/pull/3), [#4](https://github.com/TrentBest/TheSingularityWorkshop.FSM_Serialization/pull/4), and [#5](https://github.com/TrentBest/TheSingularityWorkshop.FSM_Serialization/pull/5) are now **closed as superseded**, with a reconciliation comment on each. Their unique work has been copied or replaced by the active implementation on `development`. The four surplus branch refs still exist intentionally; they are not deleted by this workflow. The repository owner will delete them only after explicitly being told reconciliation is complete.
 
-## Remaining reconciliation checks
+## Final verification and handoff
 
-- Inspect CI after the workflow change and confirm build, tests, coverage, and pack succeed.
-- Verify animated SVGs render in GitHub and in a browser; keep them explanatory, not a substitute for tests.
-- Verified CI run [39903818354](https://github.com/TrentBest/TheSingularityWorkshop.FSM_Serialization/actions/runs/39903818354) passed all 15 tests (15 passed, 0 failed), coverage collection, and packing. Inspected its actual `.nupkg`: root Gallery/README and guide/UML/diagram files were present, but source-adjacent `src/*.md` companion cards were missing and the internal Sith ledger was being packaged. The next commit corrects both: include `src/**/*.md`, exclude `docs/SITH_BRANCH_RECONCILIATION.md`. Verify the resulting artifact after CI finishes.
-- Audit the complete public API, stream edge cases, test coverage, package contents, and current release metadata.
-- Confirm the active `build.yml` publish gate and trusted-publishing configuration against the intended release procedure.
-- Confirm each open PR is either merged or closed as superseded only after its unique content is present on `development`.
-- Branch comparison confirms the four surplus branches have no unharvested unique file changes: the benchmark guide and theory are exact matches, README/CI changes are reconciled, and the separate manual publisher's stronger verification/publish gate is represented by the active build workflow. PRs #2–#5 are closed, no PRs remain open, and all four surplus branches are now **ready for the repository owner to delete manually**. No branch has been deleted by this work.
+- Latest verified CI: [run 39910661977](https://github.com/TrentBest/TheSingularityWorkshop.FSM_Serialization/actions/runs/39910661977) passed after the immutable action pins and documentation updates. It reports **17/17 tests passed**, **100% line coverage (31/31)**, and **100% branch coverage (4/4)** for the current assembly.
+- The actual 1.0.1 package artifact was inspected: version 1.0.1, README/Gallery/license, serialization-domain inventory, candidate release notes, focused UML documents, all six source companion cards, and both animated SVGs are present. The internal Sith ledger is excluded.
+- The stream audit covers short reads, end-of-stream behavior in the example format, position delegation, unsupported underlying capabilities, wrapped-stream disposal, and round-trip/truncated-input behavior.
+- All workflow action references are pinned to immutable commit SHAs. The publication job remains gated on manual dispatch, explicit `publish: true`, and the `development` ref. No publication was performed.
+- Branch comparison confirms the four surplus branches have no unharvested unique file changes: the benchmark guide and theory are exact matches, README/CI changes are reconciled, and the separate manual publisher's verification/publish gate is represented by the active build workflow. PRs #2–#5 are closed, no PRs remain open, and all four surplus branch refs remain present.
 
 **Branch target:** `master` + `development` only.  
+**Manual branch handoff:** the four surplus branches are ready for the repository owner to delete manually. No branch has been deleted by this work.  
 **Package publication:** not performed or authorized by this work.  
-**Readiness estimate:** 75% — 16/16 tests pass with 100% line and branch coverage for the current assembly; the actual 1.0.1 package has been inspected and its consumer documentation is complete. Immutable action pins are committed and the post-pinning CI run passed; rerun CI after the final documentation evidence update. Final API/edge review and manual branch handoff remain.
+**Readiness estimate:** 85% — the 1.0.1 candidate is ready for repository-owner review. The remaining 15% is reserved for review feedback and any corrections it reveals; NuGet publication still requires explicit approval.
