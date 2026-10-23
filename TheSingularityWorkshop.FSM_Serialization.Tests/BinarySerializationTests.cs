@@ -104,6 +104,19 @@ public sealed class BinarySerializationTests
     }
 
     [Fact]
+    public void StreamBinaryStreamDelegatesPositionReadsAndWrites()
+    {
+        using var backing = new MemoryStream([1, 2, 3, 4]);
+        using var stream = new StreamBinaryStream(backing);
+
+        backing.Position = 2;
+        Assert.Equal(2, stream.Position);
+
+        stream.Position = 1;
+        Assert.Equal(1, backing.Position);
+    }
+
+    [Fact]
     public void StreamBinaryStreamExposesShortReadsWithoutFillingTheBuffer()
     {
         using var backing = new PartialReadMemoryStream([1, 2, 3, 4]);
