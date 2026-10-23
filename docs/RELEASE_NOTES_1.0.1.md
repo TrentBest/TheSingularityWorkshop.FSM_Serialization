@@ -9,7 +9,8 @@ This is a documentation-led patch following the published 1.0.0 package. It does
 - Reorganizes the README around What / Why / How / See it in a minute / Documentation and provides a complete .NET 8 console walkthrough.
 - Adds `Gallery.md`, byte-operation diagrams, a serialization domain inventory, focused UML documents, and companion Markdown cards beside each source file.
 - Includes the consumer-facing Markdown guides and diagrams in the NuGet package while excluding the internal Sith branch-reconciliation ledger.
-- Expands stream tests for copied initial data, wrapped-stream disposal, and short-read propagation.
+- Expands stream tests for copied initial data, wrapped-stream disposal, short-read propagation, position delegation, and unsupported underlying capabilities.
+- Pins all GitHub Actions references in the release workflow to immutable commit SHAs.
 - Adds pull-request CI verification and keeps NuGet publication behind a manual workflow dispatch, an explicit `publish: true` input, and the `development` branch condition.
 
 ## Compatibility
@@ -20,7 +21,7 @@ This is a documentation-led patch following the published 1.0.0 package. It does
 
 ## Verification required before release
 
-- Confirm the final CI run after immutable action pinning passes build, all tests, coverage upload, and package creation.
-- Inspect the exact 1.0.1 `.nupkg` and confirm the consumer docs are present and internal operational notes are absent. This content check has passed for artifact built at commit `33a8b84d72f5b6803954d0fc6a038bc2f8e855f9`: 36 entries, version 1.0.1, all required docs and assets present, internal ledger absent.
-- Complete final review of stream edge cases, package metadata, README claims, and branch reconciliation.
+- Confirm the CI run after immutable action pinning passes build, all tests, coverage upload, and package creation. Run [39910505899](https://github.com/TrentBest/TheSingularityWorkshop.FSM_Serialization/actions/runs/39910505899) passed **17/17 tests**, with 100% line coverage (31/31) and 100% branch coverage (4/4).
+- Inspect the exact 1.0.1 `.nupkg` and confirm the consumer docs are present and internal operational notes are absent. This content check has passed for artifact built at commit `0669623b83a7534513385afe3a2a47fd70c1b9d6`: version 1.0.1, all required consumer docs and assets present, internal ledger absent.
+- Complete final review of stream edge cases, package metadata, README claims, and branch reconciliation; rerun CI after the final evidence/documentation edits.
 - Keep publication gated until the repository owner explicitly approves release.
