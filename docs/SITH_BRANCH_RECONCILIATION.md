@@ -15,8 +15,8 @@
 
 ## Documentation work now on development
 
-- Root `Gallery.md`.
-- `docs/BYTE_OPERATIONS.md` and two animated SVG flows (packing and unpacking).
+- Root `Gallery.md` (also included in the NuGet package).
+- `docs/BYTE_OPERATIONS.md` and two animated SVG flows (packing and unpacking); documentation Markdown is now included in the NuGet package alongside its images.
 - UML cards under `docs/UML/`.
 - Companion Markdown class cards beside all six source files.
 - Tutorial-first README, theory cleanup, benchmark guide, fixed CI badge, and pull-request CI trigger.
@@ -29,10 +29,12 @@ PRs [#2](https://github.com/TrentBest/TheSingularityWorkshop.FSM_Serialization/p
 
 - Inspect CI after the workflow change and confirm build, tests, coverage, and pack succeed.
 - Verify animated SVGs render in GitHub and in a browser; keep them explanatory, not a substitute for tests.
+- Verify CI for the new ownership/disposal tests and package-content changes; inspect the packed `.nupkg` contents rather than assuming MSBuild metadata behaved as intended.
 - Audit the complete public API, stream edge cases, test coverage, package contents, and current release metadata.
 - Confirm the active `build.yml` publish gate and trusted-publishing configuration against the intended release procedure.
 - Confirm each open PR is either merged or closed as superseded only after its unique content is present on `development`.
 - Then the owner can manually delete the four surplus branches. Do not delete them before this ledger and PR state are reviewed.
 
 **Branch target:** `master` + `development` only.  
-**Package publication:** not performed or authorized by this work.
+**Package publication:** not performed or authorized by this work.  
+**Readiness estimate:** 60% — documentation and branch reconciliation are substantially advanced; API/edge-case audit, package artifact inspection, final CI, and release metadata/version decision remain.
