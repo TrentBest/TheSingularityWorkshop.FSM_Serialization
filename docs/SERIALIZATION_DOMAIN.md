@@ -54,6 +54,6 @@ Those concerns may be implemented by a higher layer or a future separately desig
 
 ## Current verification evidence
 
-The CI test artifact for commit `e780f0588e22de4426f42ba966cce620d4d46a9a` reports **15 tests passed, 0 failed**. Tests cover in-memory stream basics, initial-data copying, seeking/overwriting, adapter delegation, null rejection, wrapped-stream disposal, short-read propagation, a little-endian integer round trip, and truncated input. This is a baseline, not exhaustive proof of every format concern listed above.
+The CI test artifact for commit `33a8b84d72f5b6803954d0fc6a038bc2f8e855f9` reports **16 tests passed, 0 failed**, with 100% line coverage (31/31 lines) and 100% branch coverage (4/4 branches) for the current assembly. Tests cover in-memory stream basics, initial-data copying, seeking/overwriting, adapter capability and byte delegation, position delegation, null rejection, wrapped-stream disposal, short-read propagation, a little-endian integer round trip, and truncated input. This is strong coverage of the current small API, not exhaustive proof of every format concern listed above.
 
 The latest package audit also found that source-adjacent companion Markdown was not yet included in the packed package and that the internal branch-reconciliation ledger was included unintentionally. The packaging correction is now in `development`; the next CI artifact must be inspected to confirm both outcomes.
