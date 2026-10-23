@@ -20,7 +20,7 @@ This is a documentation-led patch following the published 1.0.0 package. It does
 
 ## Verification required before release
 
-- Confirm the latest CI run passes build, all tests, coverage upload, and package creation.
-- Inspect the exact 1.0.1 `.nupkg` and confirm the consumer docs are present and internal operational notes are absent.
+- Confirm the final CI run after immutable action pinning passes build, all tests, coverage upload, and package creation.
+- Inspect the exact 1.0.1 `.nupkg` and confirm the consumer docs are present and internal operational notes are absent. This content check has passed for artifact built at commit `33a8b84d72f5b6803954d0fc6a038bc2f8e855f9`: 36 entries, version 1.0.1, all required docs and assets present, internal ledger absent.
 - Complete final review of stream edge cases, package metadata, README claims, and branch reconciliation.
 - Keep publication gated until the repository owner explicitly approves release.
