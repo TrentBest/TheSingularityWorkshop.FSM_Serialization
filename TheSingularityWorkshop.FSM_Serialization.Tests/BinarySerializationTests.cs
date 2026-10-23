@@ -128,6 +128,19 @@ public sealed class BinarySerializationTests
     }
 
     [Fact]
+    public void StreamBinaryStreamPreservesUnsupportedUnderlyingCapabilities()
+    {
+        using var backing = new NonSeekableReadOnlyStream();
+        using var stream = new StreamBinaryStream(backing);
+
+        Assert.True(stream.CanRead);
+        Assert.False(stream.CanWrite);
+        Assert.Throws<NotSupportedException>(() => _ = stream.Position);
+        Assert.Throws<NotSupportedException>(() => _ = stream.Length);
+        Assert.Throws<NotSupportedException>(() => stream.Write(new byte[] { 1 }));
+    }
+
+    [Fact]
     public void StreamBinaryStreamRejectsNullStream()
     {
         Assert.Throws<ArgumentNullException>(() => new StreamBinaryStream(null!));
@@ -206,6 +219,30 @@ public sealed class BinarySerializationTests
 
         public override int Read(Span<byte> buffer)
             => base.Read(buffer[..Math.Min(1, buffer.Length)]);
+    }
+
+    private sealed class NonSeekableReadOnlyStream : Stream
+    {
+        public override bool CanRead => true;
+        public override bool CanSeek => false;
+        public override bool CanWrite => false;
+        public override long Length => throw new NotSupportedException();
+        public override long Position
+        {
+            get => throw new NotSupportedException();
+            set => throw new NotSupportedException();
+        }
+
+        public override void Flush()
+        {
+        }
+
+        public override int Read(byte[] buffer, int offset, int count) => 0;
+        public override int Read(Span<byte> buffer) => 0;
+        public override long Seek(long offset, SeekOrigin origin) => throw new NotSupportedException();
+        public override void SetLength(long value) => throw new NotSupportedException();
+        public override void Write(byte[] buffer, int offset, int count) => throw new NotSupportedException();
+        public override void Write(ReadOnlySpan<byte> buffer) => throw new NotSupportedException();
     }
 
     private sealed class TrackingMemoryStream : MemoryStream
