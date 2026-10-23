@@ -33,7 +33,7 @@ PRs [#2](https://github.com/TrentBest/TheSingularityWorkshop.FSM_Serialization/p
 - Audit the complete public API, stream edge cases, test coverage, package contents, and current release metadata.
 - Confirm the active `build.yml` publish gate and trusted-publishing configuration against the intended release procedure.
 - Confirm each open PR is either merged or closed as superseded only after its unique content is present on `development`.
-- Then the owner can manually delete the four surplus branches. Do not delete them before this ledger and PR state are reviewed.
+- Branch comparison confirms the four surplus branches have no unharvested unique file changes: the benchmark guide and theory are exact matches, README/CI changes are reconciled, and the separate manual publisher's stronger verification/publish gate is represented by the active build workflow. PRs #2–#5 are closed, no PRs remain open, and all four surplus branches are now **ready for the repository owner to delete manually**. No branch has been deleted by this work.
 
 **Branch target:** `master` + `development` only.  
 **Package publication:** not performed or authorized by this work.  
