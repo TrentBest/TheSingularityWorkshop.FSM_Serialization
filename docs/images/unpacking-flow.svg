@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="430" viewBox="0 0 960 430" role="img" aria-labelledby="title desc">
+  <title id="title">Unpacking: bytes become domain state</title>
+  <desc id="desc">An animated byte token travels from a byte source through IBinaryStream and IBinaryUnpackable to reconstructed domain state. Short reads and format validation belong to the unpacker.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#101b31"/><stop offset="1" stop-color="#172b43"/></linearGradient>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#8ca8c9"/></marker>
+  </defs>
+  <rect width="960" height="430" rx="24" fill="url(#bg)"/>
+  <text x="44" y="48" fill="#f4f7fb" font-family="Segoe UI,Arial,sans-serif" font-size="25" font-weight="700">UNPACK · bytes → meaning</text>
+  <text x="44" y="75" fill="#a9bfd8" font-family="Segoe UI,Arial,sans-serif" font-size="14">Read counts matter. The parser owns interpretation and validation.</text>
+  <g font-family="Segoe UI,Arial,sans-serif" text-anchor="middle">
+    <rect x="42" y="128" width="147" height="112" rx="14" fill="#2b493f" stroke="#53e2c2" stroke-width="1.5"/>
+    <text x="115" y="163" fill="#fff" font-size="17" font-weight="700">Byte source</text><text x="115" y="188" fill="#d0eee5" font-size="13">current position</text><text x="115" y="210" fill="#53e2c2" font-size="12">may end early</text>
+    <rect x="212" y="128" width="190" height="112" rx="14" fill="#203d5a" stroke="#5d84ad" stroke-width="1.5"/>
+    <text x="307" y="163" fill="#fff" font-size="17" font-weight="700">IBinaryStream</text><text x="307" y="188" fill="#c9d9ea" font-size="13">Read(buffer)</text><text x="307" y="210" fill="#ffd166" font-size="12">returns actual count</text>
+    <rect x="425" y="128" width="208" height="112" rx="14" fill="#203d5a" stroke="#5d84ad" stroke-width="1.5"/>
+    <text x="529" y="163" fill="#fff" font-size="17" font-weight="700">IBinaryUnpackable</text><text x="529" y="188" fill="#c9d9ea" font-size="13">Unpack(stream)</text><text x="529" y="210" fill="#53e2c2" font-size="12">parse + validate</text>
+    <rect x="656" y="128" width="262" height="112" rx="14" fill="#203d5a" stroke="#5d84ad" stroke-width="1.5"/>
+    <text x="787" y="163" fill="#fff" font-size="17" font-weight="700">Domain state</text><text x="787" y="188" fill="#c9d9ea" font-size="13">reconstructed value</text><text x="787" y="210" fill="#53e2c2" font-size="12">meaning restored</text>
+  </g>
+  <g fill="none" stroke="#8ca8c9" stroke-width="2" marker-end="url(#arrow)"><path d="M189 184 H204"/><path d="M402 184 H417"/><path d="M633 184 H648"/></g>
+  <g fill="#ffd166" stroke="#fff1b8" stroke-width="1">
+    <rect x="0" y="0" width="38" height="25" rx="5"><animateMotion dur="6s" repeatCount="indefinite" path="M0 171 L212 171 L425 171 L656 171 L940 171"/></rect>
+  </g>
+  <rect x="170" y="285" width="620" height="64" rx="12" fill="#482f35" stroke="#f28b82" stroke-width="1.5"/>
+  <text x="480" y="311" fill="#fff" font-family="Segoe UI,Arial,sans-serif" font-size="16" font-weight="700" text-anchor="middle">Incomplete field? Stop, handle the short read.</text>
+  <text x="480" y="332" fill="#f4c9c5" font-family="Segoe UI,Arial,sans-serif" font-size="13" text-anchor="middle">Do not decode a partially filled fixed-width buffer as complete data.</text>
+  <text x="480" y="389" fill="#a9bfd8" font-family="Segoe UI,Arial,sans-serif" font-size="13" text-anchor="middle">Illustrative flow — the domain unpacker defines field widths and error policy.</text>
+</svg>
