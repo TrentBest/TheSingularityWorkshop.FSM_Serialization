@@ -104,6 +104,17 @@ public sealed class BinarySerializationTests
     }
 
     [Fact]
+    public void StreamBinaryStreamExposesShortReadsWithoutFillingTheBuffer()
+    {
+        using var backing = new PartialReadMemoryStream([1, 2, 3, 4]);
+        using var stream = new StreamBinaryStream(backing);
+        Span<byte> buffer = stackalloc byte[4];
+
+        Assert.Equal(1, stream.Read(buffer));
+        Assert.Equal((byte)1, buffer[0]);
+    }
+
+    [Fact]
     public void StreamBinaryStreamRejectsNullStream()
     {
         Assert.Throws<ArgumentNullException>(() => new StreamBinaryStream(null!));
@@ -172,6 +183,16 @@ public sealed class BinarySerializationTests
         var value = new TestValue();
 
         Assert.Throws<EndOfStreamException>(() => value.Unpack(stream));
+    }
+
+    private sealed class PartialReadMemoryStream : MemoryStream
+    {
+        public PartialReadMemoryStream(byte[] data) : base(data)
+        {
+        }
+
+        public override int Read(Span<byte> buffer)
+            => base.Read(buffer[..Math.Min(1, buffer.Length)]);
     }
 
     private sealed class TrackingMemoryStream : MemoryStream
