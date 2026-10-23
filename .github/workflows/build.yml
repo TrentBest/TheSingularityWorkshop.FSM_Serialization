@@ -22,9 +22,9 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - name: Checkout
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
       - name: Setup .NET
-        uses: actions/setup-dotnet@v6
+        uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6
         with:
           dotnet-version: 8.0.x
       - name: Restore
@@ -53,7 +53,7 @@ jobs:
           cp "$coverage_file" ./TestResults/coverage.cobertura.xml
           echo "Prepared coverage report: $coverage_file"
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v6
+        uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v6
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           slug: TrentBest/TheSingularityWorkshop.FSM_Serialization
@@ -62,12 +62,12 @@ jobs:
       - name: Pack
         run: dotnet pack TheSingularityWorkshop.FSM_Serialization.csproj --configuration Release --no-build --output ./artifacts
       - name: Upload NuGet package artifact
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
         with:
           name: fsm-serialization-nuget-package
           path: ./artifacts/*.nupkg
       - name: Upload test and coverage artifacts
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
         with:
           name: fsm-serialization-test-results
           path: ./TestResults/*
@@ -80,12 +80,12 @@ jobs:
       id-token: write
     steps:
       - name: Download NuGet package
-        uses: actions/download-artifact@v8
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8
         with:
           name: fsm-serialization-nuget-package
           path: ./artifacts
       - name: Authenticate with NuGet Trusted Publishing
-        uses: NuGet/login@v1
+        uses: NuGet/login@8d196754b4036150537f80ac539e15c2f1028841 # v1.2.0
         id: login
         with:
           user: TheSingularityWorkshop
