@@ -148,6 +148,24 @@ For a meaningful comparison, keep package version, benchmark source, runtime, pa
 
 Performance measurements are sensitive to hardware, runtime, OS, thermal state, background activity, and benchmark configuration.
 
+## Relating the package benchmark to FSM_COS stress results
+
+An end-to-end stress-test improvement reported in FSM_COS/Simple Demos is valuable evidence about that workload, but it is not automatically a measurement of FSM_Serialization. The current BenchmarkDotNet numbers above are historical microbenchmarks of the stream primitives and an illustrative pack/unpack value. Keep those evidence classes separate.
+
+For the reported roughly 21% FSM_COS stress-test improvement, preserve the original Simple Demos baseline and record its exact source commit, scenario, runtime, machine, workload size, warm-up, duration, and measured metrics. Then run a controlled comparison with identical semantic input:
+
+1. FSM workload without serialization in the measured path.
+2. Pack only into an in-memory stream.
+3. Unpack from a prepared byte buffer.
+4. Pack + unpack round trip.
+5. Snapshot capture plus pack/unpack, if snapshot construction is part of the real consumer.
+
+Measure elapsed time/throughput and allocations/bytes copied. Vary active FSM count, state/transition count, context payload size, and update cadence. Separate snapshot consistency/capture cost from encoding cost. Do not claim the serializer caused or explains the full 21% until this isolation experiment supports that conclusion.
+
+The resulting report should include the original baseline and new measurements side by side, exact commit IDs, raw BenchmarkDotNet or stress-harness output, and an explanation of which layer accounts for each change. A faster end-to-end result can coexist with a slower serialization sub-operation if another part of the workload improved more.
+
+See [the FSM_Serialization test matrix](TEST_MATRIX.md) for the domain questions and acceptance gates that accompany the benchmark plan.
+
 ## Why the benchmark is separate from CI
 
 Correctness belongs in normal CI.
