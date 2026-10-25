@@ -27,7 +27,7 @@ The first three changes are functionally superseded or intentionally adapted by 
 
 ## Package artifact follow-up
 
-A fresh inspection of workflow run `40163607694` confirmed that `dotnet pack` generated both the version 1.0.1 `.nupkg` and `.snupkg`, but the workflow artifact glob (`./artifacts/*.nupkg`) uploaded only the primary package. The active `.github/workflows/build.yml` now explicitly uploads both extensions. The next run must confirm both files are in the artifact; the guarded publish job can then download both into the same folder, allowing NuGet's documented push behavior to publish the main package followed by its matching symbol package. This does not authorize or trigger publication.
+Inspection of run `40163607694` found that `dotnet pack` generated both the version 1.0.1 `.nupkg` and `.snupkg`, but the old artifact glob uploaded only the primary package. The workflow was corrected to upload both extensions. Run [40163719191](https://github.com/TrentBest/TheSingularityWorkshop.FSM_Serialization/actions/runs/40163719191) then passed and its artifact was inspected: both packages are present, and the `.snupkg` contains a PDB. The publish job was skipped. This does not authorize or trigger publication.
 
 ## Documentation work now on development
 
