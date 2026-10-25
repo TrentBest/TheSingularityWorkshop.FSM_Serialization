@@ -11,9 +11,9 @@ jobs:
   dispatch-benchmarks:
     name: Request source-commit benchmark
     runs-on: ubuntu-latest
-    if: ${{ secrets.BENCHMARKS_DISPATCH_TOKEN != '' }}
     steps:
       - name: Dispatch exact source commit to benchmark repository
+        if: ${{ secrets.BENCHMARKS_DISPATCH_TOKEN != '' }}
         env:
           GH_TOKEN: ${{ secrets.BENCHMARKS_DISPATCH_TOKEN }}
           SOURCE_SHA: ${{ github.sha }}
