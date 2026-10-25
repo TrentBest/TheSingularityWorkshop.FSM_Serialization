@@ -21,7 +21,8 @@ This is a documentation-led patch following the published 1.0.0 package. It does
 
 ## Verification required before release
 
-- Confirm the CI run after immutable action pinning passes build, all tests, coverage upload, and package creation. Run [39910505899](https://github.com/TrentBest/TheSingularityWorkshop.FSM_Serialization/actions/runs/39910505899) passed **17/17 tests**, with 100% line coverage (31/31) and 100% branch coverage (4/4).
-- Inspect the exact 1.0.1 `.nupkg` and confirm the consumer docs are present and internal operational notes are absent. This content check has passed for artifact built at commit `0669623b83a7534513385afe3a2a47fd70c1b9d6`: version 1.0.1, all required consumer docs and assets present, internal ledger absent.
-- Complete final review of stream edge cases, package metadata, README claims, and branch reconciliation; rerun CI after the final evidence/documentation edits.
+- Pre-reconciliation CI evidence: [run 39988802838](https://github.com/TrentBest/TheSingularityWorkshop.FSM_Serialization/actions/runs/39988802838), commit `f794b1d7f33f061d86af4b3e8a1ed2b92912c27d`, passed restore, Release build, **17/17 tests**, coverage report preparation/upload, package creation, and artifact upload. The NuGet publish job was skipped.
+- The exact `.nupkg` from that run was downloaded and inspected. It contains version 1.0.1, the net8.0 DLL and XML documentation, README, Gallery, license, release notes, consumer documentation, six source companion cards, UML documentation, and SVG/JPG assets. The internal `docs/SITH_BRANCH_RECONCILIATION.md` is absent. The package metadata records source commit `f794b1d7f33f061d86af4b3e8a1ed2b92912c27d`.
+- The README's verification badge points to the actual `.github/workflows/build.yml`. The shared Workshop Documentation Standard reference from `master` has been preserved in the active README.
+- The branch ledger now records the four `master`-only commits and their disposition. Final branch comparison and a fresh CI run/package inspection are still required after the documentation reconciliation commits.
 - Keep publication gated until the repository owner explicitly approves release.
