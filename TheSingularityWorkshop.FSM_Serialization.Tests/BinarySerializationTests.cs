@@ -187,6 +187,51 @@ public sealed class BinarySerializationTests
     }
 
     [Fact]
+    public void TestValuePacksInt32AsLittleEndianGoldenBytes()
+    {
+        var value = new TestValue(0x12345678);
+        using var stream = new MemoryBinaryStream();
+
+        value.Pack(stream);
+
+        Assert.Equal(new byte[] { 0x78, 0x56, 0x34, 0x12 }, stream.ToArray());
+    }
+
+    [Theory]
+    [InlineData(int.MinValue)]
+    [InlineData(-1)]
+    [InlineData(0)]
+    [InlineData(1)]
+    [InlineData(int.MaxValue)]
+    public void TestValueRoundTripsInt32BoundaryValues(int originalValue)
+    {
+        var original = new TestValue(originalValue);
+        using var stream = new MemoryBinaryStream();
+
+        original.Pack(stream);
+        stream.Position = 0;
+
+        var restored = new TestValue();
+        restored.Unpack(stream);
+
+        Assert.Equal(originalValue, restored.Value);
+    }
+
+    [Fact]
+    public void UnpackRejectsEveryTruncatedInt32Prefix()
+    {
+        byte[] completeValue = [0x78, 0x56, 0x34, 0x12];
+
+        for (int length = 0; length < completeValue.Length; length++)
+        {
+            using var stream = new MemoryBinaryStream(completeValue[..length]);
+            var value = new TestValue();
+
+            Assert.Throws<EndOfStreamException>(() => value.Unpack(stream));
+        }
+    }
+
+    [Fact]
     public void BinarySerializableCombinesPackAndUnpackContracts()
     {
         IBinarySerializable value = new TestValue(42);
