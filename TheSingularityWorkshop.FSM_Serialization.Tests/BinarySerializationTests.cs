@@ -267,7 +267,7 @@ public sealed class BinarySerializationTests
     [Fact]
     public void UnpackCanCompleteAFieldAcrossMultipleShortReads()
     {
-        using var backing = new PartialReadMemoryStream(BitConverter.GetBytes(0x12345678));
+        using var backing = new PartialReadMemoryStream([0x78, 0x56, 0x34, 0x12]);
         using var stream = new StreamBinaryStream(backing);
         var value = new TestValue();
 
