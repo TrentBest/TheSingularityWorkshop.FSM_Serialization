@@ -913,7 +913,13 @@ The current suite verifies:
 - writes reaching the wrapped .NET stream;
 - pack/unpack round trips;
 - combined IBinarySerializable behavior;
-- incomplete binary input handling.
+- incomplete binary input handling;
+- empty-buffer reads and writes;
+- seeking beyond the end and zero-filled extension;
+- rejection of negative positions;
+- operations after disposal;
+- flush delegation;
+- fixed-size fields completed across multiple short reads.
 
 The test project targets .NET 8 and references the library project directly.
 
