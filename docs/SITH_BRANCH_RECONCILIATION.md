@@ -16,7 +16,7 @@
 
 ## `master`-only work found in the current comparison
 
-The current ref comparison is `development` 80 commits ahead and 4 commits behind `master` (merge base `4ebf9545f47d8b997be6656b79994f56c986440d`). These four `master`-only commits were reviewed individually:
+The current ref comparison is `development` 89 commits ahead and 4 commits behind `master` (merge base `4ebf9545f47d8b997be6656b79994f56c986440d`). These four `master`-only commits were reviewed individually:
 
 - `9234ba8` disabled automatic NuGet publication. The active `development` workflow supersedes that temporary hard-disable with a stricter explicit manual-dispatch gate: `publish: true` **and** `refs/heads/development`; no publication was performed.
 - `81d0cfa` added the shared Workshop moniker to the README. The current `development` README already uses the animated Workshop moniker from Renderer.
@@ -52,4 +52,4 @@ PRs [#2](https://github.com/TrentBest/TheSingularityWorkshop.FSM_Serialization/p
 **Branch target:** `master` + `development` only.  
 **Manual branch handoff:** the four surplus branches are ready for the repository owner to delete manually. No branch has been deleted by this work.  
 **Package publication:** not performed or authorized by this work.  
-**Readiness estimate:** 85% — the candidate's pre-reconciliation CI and package artifact are verified, but final docs changes require a fresh run. The remaining gates are post-edit CI/package inspection, a final diff/branch-ledger check, and repository-owner review. NuGet publication still requires explicit approval.
+**Readiness estimate:** 90% — final documentation commit `51d578a1799206365979baa49209f5c26d98bda6` passed CI in [run 40163786120](https://github.com/TrentBest/TheSingularityWorkshop.FSM_Serialization/actions/runs/40163786120). The resulting artifact was inspected and contains both version 1.0.1 packages; the `.snupkg` contains a PDB, package metadata points to the tested commit, and the internal ledger is excluded from the `.nupkg`. Remaining work is repository-owner review and the owner's manual deletion of the four reconciled surplus branches. NuGet publication still requires explicit approval.
