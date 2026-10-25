@@ -211,6 +211,71 @@ public sealed class BinarySerializationTests
         Assert.Throws<EndOfStreamException>(() => value.Unpack(stream));
     }
 
+    [Fact]
+    public void MemoryBinaryStreamEmptyReadsAndWritesAreNoOps()
+    {
+        using var stream = new MemoryBinaryStream([1, 2]);
+
+        Assert.Equal(0, stream.Read(Span<byte>.Empty));
+        stream.Write(ReadOnlySpan<byte>.Empty);
+
+        Assert.Equal(2, stream.Length);
+        Assert.Equal(new byte[] { 1, 2 }, stream.ToArray());
+    }
+
+    [Fact]
+    public void MemoryBinaryStreamCanWriteAfterSeekingPastEnd()
+    {
+        using var stream = new MemoryBinaryStream([1, 2]);
+
+        stream.Position = 4;
+        stream.Write([9]);
+
+        Assert.Equal(new byte[] { 1, 2, 0, 0, 9 }, stream.ToArray());
+        Assert.Equal(5, stream.Length);
+    }
+
+    [Fact]
+    public void MemoryBinaryStreamRejectsNegativePosition()
+    {
+        using var stream = new MemoryBinaryStream();
+
+        Assert.Throws<ArgumentOutOfRangeException>(() => stream.Position = -1);
+    }
+
+    [Fact]
+    public void MemoryBinaryStreamOperationsFailAfterDisposal()
+    {
+        var stream = new MemoryBinaryStream();
+        stream.Dispose();
+
+        Assert.Throws<ObjectDisposedException>(() => _ = stream.Length);
+        Assert.Throws<ObjectDisposedException>(() => stream.ToArray());
+    }
+
+    [Fact]
+    public void StreamBinaryStreamDelegatesFlush()
+    {
+        using var backing = new TrackingMemoryStream();
+        using var stream = new StreamBinaryStream(backing);
+
+        stream.Flush();
+
+        Assert.True(backing.WasFlushed);
+    }
+
+    [Fact]
+    public void UnpackCanCompleteAFieldAcrossMultipleShortReads()
+    {
+        using var backing = new PartialReadMemoryStream(BitConverter.GetBytes(0x12345678));
+        using var stream = new StreamBinaryStream(backing);
+        var value = new TestValue();
+
+        value.Unpack(stream);
+
+        Assert.Equal(0x12345678, value.Value);
+    }
+
     private sealed class PartialReadMemoryStream : MemoryStream
     {
         public PartialReadMemoryStream(byte[] data) : base(data)
@@ -248,6 +313,13 @@ public sealed class BinarySerializationTests
     private sealed class TrackingMemoryStream : MemoryStream
     {
         public bool WasDisposed { get; private set; }
+        public bool WasFlushed { get; private set; }
+
+        public override void Flush()
+        {
+            WasFlushed = true;
+            base.Flush();
+        }
 
         protected override void Dispose(bool disposing)
         {
@@ -279,9 +351,16 @@ public sealed class BinarySerializationTests
         public void Unpack(IBinaryStream stream)
         {
             Span<byte> buffer = stackalloc byte[sizeof(int)];
+            int totalRead = 0;
 
-            if (stream.Read(buffer) != buffer.Length)
-                throw new EndOfStreamException();
+            while (totalRead < buffer.Length)
+            {
+                int bytesRead = stream.Read(buffer[totalRead..]);
+                if (bytesRead == 0)
+                    throw new EndOfStreamException();
+
+                totalRead += bytesRead;
+            }
 
             Value = BinaryPrimitives.ReadInt32LittleEndian(buffer);
         }
