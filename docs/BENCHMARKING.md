@@ -163,7 +163,7 @@ The seven measured steady-state tick-time rows yield:
 | Median of all 7 raw tick times | 0.180824 ms | 0.143573 ms | 20.6% |
 | Median of paired per-trial percentage changes | — | — | 2.2% |
 
-The paired improvements vary substantially: approximately +20.7%, +0.8%, -6.8%, +40.5%, +2.2%, -3.3%, and +5.1% (positive means FSM_COS ticked faster). This disagreement between summary methods, plus large trial-to-trial variation, means the ~21% figure is an **early observation, not a statistically robust conclusion**. The raw artifact is available from the [CI run's artifacts](https://github.com/TrentBest/SimpleDemos/actions/runs/40162369632).
+The paired improvements vary substantially: approximately +20.7%, +0.8%, -6.8%, +40.5%, +2.2%, -3.3%, and +5.1% (positive means FSM_COS ticked faster). This disagreement between summary methods, plus large trial-to-trial variation, means the ~21% figure is an **early observation, not a statistically robust conclusion**. The raw artifact is available from the [CI run's artifacts](https://github.com/TrentBest/SimpleDemos/actions/runs/40162369632). The canonical measurement contract and next-experiment gates are documented in [SimpleDemos' FSM_COS stress benchmark protocol](https://github.com/TrentBest/SimpleDemos/blob/development/docs/FSM_COS_STRESS_BENCHMARK.md).
 
 Steady-state allocations were effectively equal in this sample: 96,728 bytes/tick for most rows, with 96,731 bytes in the first direct row and 96,728 bytes in its paired FSM_COS row. Setup/composition and bundle-load times varied and should be reported separately from tick time.
 
