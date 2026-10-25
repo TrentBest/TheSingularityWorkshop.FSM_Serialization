@@ -212,3 +212,51 @@ The goal is not to "win" a benchmark.
 The goal is to know what changed.
 
 **Measure first. Change one thing. Measure again.**
+
+
+## High-performance technique replication plan
+
+The existing results are a useful primitive-stream baseline, not a complete serializer shootout. Extend the companion benchmark repository without deleting or rewriting its historical cases. Add independent benchmark families so each result answers one question and does not mix payload-stream overhead with FSM graph encoding.
+
+### Baselines and candidate techniques
+
+| Family | Implementations / techniques | Main question |
+|---|---|---|
+| BCL primitives | `MemoryStream`, `BinaryReader` / `BinaryWriter`, direct array and `Span<byte>` operations | What does the platform provide without our abstraction? |
+| Buffer capacity | Default-growing buffer, exact pre-sizing, reusable caller-owned buffer | How much time and allocation come from growth and buffer ownership? |
+| Pooling | Ordinary allocation versus `ArrayPool<byte>` rent/return; include cold and warmed cases | Does pooling help at each size after its lifecycle costs are included? |
+| Integer formats | Fixed-width little-endian integers, unsigned varints, zigzag signed integers where useful | Is smaller output worth the extra encode/decode work? |
+| Strings/symbols | UTF-8 strings with lengths, repeated strings inline, string table plus local indices | When does interning pay for its table construction and lookup? |
+| Graph references | Repeated external IDs/references versus dense local indices and explicit tables | Does FSM topology provide a real compression or traversal advantage? |
+| Output layout | One-pass append, two-pass exact sizing, reserved header with backpatching | Which strategy minimizes total time, copying, and allocation for each graph size? |
+| Established serializers | Add mature binary serializers only where their supported data model can represent the same semantic graph fairly | How does the custom codec compare with a recognized general-purpose implementation? |
+| FSM semantic codec | Definition encode-only, decode-only, round-trip; later snapshot/history cases as separate suites | Do low-level gains survive on real FSM definitions? |
+
+Potential established comparison candidates include MessagePack-CSharp, MemoryPack, protobuf-net, and a JSON baseline such as System.Text.Json where the DTO mapping is equivalent. Treat these as **candidate adapters to validate**, not assumed winners or mandatory dependencies of the production package. Record the exact package versions, target frameworks, configuration, and supported model mapping. If a library cannot faithfully represent the target semantics without custom workarounds, report that limitation instead of presenting it as an equivalent competitor.
+
+Do not combine the mature serializers' dependencies with the production core merely to benchmark them. Keep comparison adapters in the benchmark project. Preserve a plain BCL/reference implementation as an auditable floor.
+
+### Fair-comparison rules
+
+1. **Same semantic input:** every contender receives equivalent FSM definitions and produces equivalent decoded meaning. Verify decoded output outside the timed region or in a separate correctness test.
+2. **Separate setup from work:** prebuild input graphs for encode-only; prepare byte arrays for decode-only; report construction-plus-encode and full round-trip separately.
+3. **Report both time and bytes:** BenchmarkDotNet memory diagnostics plus encoded length, allocated bytes, Gen0 collections, and throughput. Where useful, add disassembly/hardware-counter diagnostics as separate runs rather than burdening every benchmark.
+4. **Use multiple graph shapes:** tiny, typical, large, dense-transition, repeated-name-heavy, sparse external-ID, and long-name cases. Vary state count, transition count, and string repetition independently where possible.
+5. **Do not handicap a baseline:** pre-size it when the equivalent contender knows the final size; also retain a realistic default-use case as a distinct benchmark. Avoid timing input generation, logging, validation comparisons, or file/network I/O unless that is the named scenario.
+6. **Separate cold and warm costs:** first-use setup, pool warm-up, static initialization, and steady-state operations are different measurements.
+7. **Publish raw evidence:** keep BenchmarkDotNet artifacts, raw CSV/JSON output, benchmark source commit, package versions, runtime, OS, CPU, and command line with each result. Never promote one machine's microbenchmark into a universal claim.
+8. **Report the trade-offs honestly:** include output size and allocations beside elapsed time. A faster but much larger format, or a smaller but slower format, is a result—not a reason to hide one metric.
+9. **Use repeated runs and noise-aware interpretation:** compare distributions and per-case results, not only one aggregate mean. Establish an improvement threshold before optimization work and repeat suspicious wins.
+10. **Keep historical evidence immutable:** add new result sets with their own metadata; do not replace old measurements with results from a different machine or benchmark version.
+
+### Staged execution
+
+1. Verify the current companion repository's branch, project layout, and existing benchmark methods before editing.
+2. Preserve and rerun the primitive-stream suite against the published package version and a clearly labelled source-build suite if needed; never silently substitute source code for the published package under test.
+3. Add a BCL/reference matrix for fixed-width, varint, UTF-8, string-table, preallocated, pooled, and graph-index strategies.
+4. Add mature serializer adapters behind benchmark-only project references, one at a time, after the semantic FSM definition model is fixed.
+5. Generate deterministic FSM graph fixtures and prove semantic equivalence in unit tests before accepting their performance numbers.
+6. Capture an unoptimized FSM definition-codec baseline first. Optimize one variable per experiment and keep the previous result.
+7. Summarize per-workload winners and crossover points; avoid naming one universal winner if the results differ by graph size or shape.
+
+No technique should be described as faster until the measured suite demonstrates it. The purpose is to establish a reproducible evidence base, including negative results, before choosing the production wire format.
