@@ -152,7 +152,26 @@ Performance measurements are sensitive to hardware, runtime, OS, thermal state, 
 
 An end-to-end stress-test improvement reported in FSM_COS/Simple Demos is valuable evidence about that workload, but it is not automatically a measurement of FSM_Serialization. The current BenchmarkDotNet numbers above are historical microbenchmarks of the stream primitives and an illustrative pack/unpack value. Keep those evidence classes separate.
 
-For the reported roughly 21% FSM_COS stress-test improvement, preserve the original Simple Demos baseline and record its exact source commit, scenario, runtime, machine, workload size, warm-up, duration, and measured metrics. Then run a controlled comparison with identical semantic input:
+### What the first seven-trial comparison actually shows
+
+The [SimpleDemos CI run 40162369632](https://github.com/TrentBest/SimpleDemos/actions/runs/40162369632) uploaded a raw CSV sample for commit 82fa35031137f0d8687794c39651290b1a8a7288. The runner used .NET 8.0.32 on Ubuntu 24.04.5 LTS with four logical CPUs, Release configuration, 1,000 workers, 20 warm-up ticks, and 200 measured ticks per trial. Every trial passed the equivalence gate: 1,000 worker updates and 3,000 payload operations per measured tick on both paths.
+
+The seven measured steady-state tick-time rows yield:
+
+| Summary | Direct FSM_API | FSM_COS-composed | Apparent reduction |
+|---|---:|---:|---:|
+| Median of all 7 raw tick times | 0.180824 ms | 0.143573 ms | 20.6% |
+| Median of paired per-trial percentage changes | — | — | 2.2% |
+
+The paired improvements vary substantially: approximately +20.7%, +0.8%, -6.8%, +40.5%, +2.2%, -3.3%, and +5.1% (positive means FSM_COS ticked faster). This disagreement between summary methods, plus large trial-to-trial variation, means the ~21% figure is an **early observation, not a statistically robust conclusion**. The raw artifact is available from the [CI run's artifacts](https://github.com/TrentBest/SimpleDemos/actions/runs/40162369632).
+
+Steady-state allocations were effectively equal in this sample: 96,728 bytes/tick for most rows, with 96,731 bytes in the first direct row and 96,728 bytes in its paired FSM_COS row. Setup/composition and bundle-load times varied and should be reported separately from tick time.
+
+Also keep the workloads distinct: the original Stress/Program.cs stress test ramps to tens of thousands of workers and records FPS, operations/frame, and memory delta until the 30-FPS threshold is crossed. The new direct-versus-FSM_COS comparator is a bounded 1,000-worker, interval-1 experiment that measures mean tick time, allocations, and startup/composition. These are complementary experiments, **not yet a direct apples-to-apples replication of the original scaling curve**.
+
+### Required next comparison
+
+Preserve and rerun the original SimpleDemos baseline alongside the FSM_COS path using the same worker counts, tick intervals, runtime, and threshold policy. Record exact source commits and raw CSV output. For serialization itself, add separate measurements with identical semantic input:
 
 1. FSM workload without serialization in the measured path.
 2. Pack only into an in-memory stream.
@@ -160,9 +179,9 @@ For the reported roughly 21% FSM_COS stress-test improvement, preserve the origi
 4. Pack + unpack round trip.
 5. Snapshot capture plus pack/unpack, if snapshot construction is part of the real consumer.
 
-Measure elapsed time/throughput and allocations/bytes copied. Vary active FSM count, state/transition count, context payload size, and update cadence. Separate snapshot consistency/capture cost from encoding cost. Do not claim the serializer caused or explains the full 21% until this isolation experiment supports that conclusion.
+Measure elapsed time/throughput and allocations/bytes copied. Vary active FSM count, state/transition count, context payload size, and update cadence. Separate snapshot consistency/capture cost from encoding cost. Do not attribute the full ~21% end-to-end observation to the serializer until an isolated experiment supports that conclusion.
 
-The resulting report should include the original baseline and new measurements side by side, exact commit IDs, raw BenchmarkDotNet or stress-harness output, and an explanation of which layer accounts for each change. A faster end-to-end result can coexist with a slower serialization sub-operation if another part of the workload improved more.
+The resulting report should include the original baseline and new measurements side by side, exact commit IDs, raw stress-harness output, and an explanation of which layer accounts for each change. A faster end-to-end result can coexist with a slower serialization sub-operation if another part of the workload improved more.
 
 See [the FSM_Serialization test matrix](TEST_MATRIX.md) for the domain questions and acceptance gates that accompany the benchmark plan.
 
