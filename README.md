@@ -91,8 +91,16 @@ public sealed class ExampleState : IBinarySerializable
     public void Unpack(IBinaryStream stream)
     {
         Span<byte> buffer = stackalloc byte[sizeof(int)];
-        if (stream.Read(buffer) != buffer.Length)
-            throw new EndOfStreamException();
+        int totalRead = 0;
+
+        while (totalRead < buffer.Length)
+        {
+            int bytesRead = stream.Read(buffer[totalRead..]);
+            if (bytesRead == 0)
+                throw new EndOfStreamException();
+
+            totalRead += bytesRead;
+        }
 
         Value = BinaryPrimitives.ReadInt32LittleEndian(buffer);
     }
