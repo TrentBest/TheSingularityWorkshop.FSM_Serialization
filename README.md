@@ -913,7 +913,8 @@ The current suite verifies:
 - writes reaching the wrapped .NET stream;
 - pack/unpack round trips;
 - combined IBinarySerializable behavior;
-- incomplete binary input handling and truncation at each prefix length;\n- golden little-endian byte layout and signed Int32 boundary round trips;
+- incomplete binary input handling and truncation at each prefix length;
+- golden little-endian byte layout and signed Int32 boundary round trips;
 - empty-buffer reads and writes;
 - seeking beyond the end and zero-filled extension;
 - rejection of negative positions;
