@@ -13,6 +13,18 @@ This is a documentation-led patch following the published 1.0.0 package. It does
 - Pins all GitHub Actions references in the release workflow to immutable commit SHAs.
 - Adds pull-request CI verification and keeps NuGet publication behind a manual workflow dispatch, an explicit `publish: true` input, and the `development` branch condition.
 
+## Test and domain hardening follow-up
+
+The candidate is also being hardened before release review:
+
+- Expanded stream contract tests for empty buffers, seeking beyond the end, negative positions, disposed-stream behavior, flush delegation, and completing fixed-size fields across repeated short reads.
+- Added a golden little-endian Int32 byte fixture, signed Int32 boundary round trips, and rejection checks for every truncated prefix of the example field.
+- Corrected the README quick-start example to loop until a fixed-size field is complete or a zero-byte read proves end-of-input; a single short read is not necessarily EOF.
+- Added a serialization domain inventory and test matrix that distinguish primitive stream behavior from format-specific requirements, FSM definition versus runtime snapshot decisions, compatibility, canonical bytes, resource limits, abuse testing, and performance evidence.
+- Added CI minimums of 90% line coverage and 85% branch coverage. The previously inspected baseline was 100% for both (31/31 lines, 4/4 branches), but the expanded test suite and new gate require a fresh successful run before the candidate's current coverage can be claimed.
+
+The reported roughly 21% FSM_COS/Simple Demos stress-test improvement is treated as an end-to-end observation, not automatically attributed to serialization. The benchmark guide now specifies a controlled plan to isolate pack, unpack, round-trip, snapshot-capture, allocation, and copying costs.
+
 ## Compatibility
 
 - No public API changes are intended.
