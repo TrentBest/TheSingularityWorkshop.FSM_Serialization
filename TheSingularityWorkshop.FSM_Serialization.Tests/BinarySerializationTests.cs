@@ -250,7 +250,7 @@ public sealed class BinarySerializationTests
         stream.Dispose();
 
         Assert.Throws<ObjectDisposedException>(() => _ = stream.Length);
-        Assert.Throws<ObjectDisposedException>(() => stream.ToArray());
+        Assert.Throws<ObjectDisposedException>(() => stream.Read(new byte[1]));
     }
 
     [Fact]
