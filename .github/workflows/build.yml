@@ -52,6 +52,25 @@ jobs:
           fi
           cp "$coverage_file" ./TestResults/coverage.cobertura.xml
           echo "Prepared coverage report: $coverage_file"
+      - name: Enforce coverage thresholds
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import sys
+          import xml.etree.ElementTree as ET
+
+          report = ET.parse("./TestResults/coverage.cobertura.xml").getroot()
+          line_rate = float(report.attrib["line-rate"])
+          branch_rate = float(report.attrib["branch-rate"])
+          minimum_line = 0.90
+          minimum_branch = 0.85
+
+          print(f"Line coverage: {line_rate:.1%} (minimum {minimum_line:.0%})")
+          print(f"Branch coverage: {branch_rate:.1%} (minimum {minimum_branch:.0%})")
+
+          if line_rate < minimum_line or branch_rate < minimum_branch:
+              sys.exit("Coverage is below the required threshold.")
+          PY
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v6
         with:
