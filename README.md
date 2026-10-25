@@ -13,6 +13,8 @@
 
 The type that owns meaning should own its representation rules. This package provides byte-oriented contracts and stream adapters without turning into a general-purpose object-graph serializer or persistence framework.
 
+This README follows the Workshop's shared [Documentation Standard](https://github.com/TrentBest/TheSingularityWorkshop.FSM_COS/blob/master/DOCUMENTATION_STANDARD.md), while keeping this repository's purpose and implementation authoritative.
+
 ```mermaid
 flowchart TD
   D[Domain-owned state] --> P[Binary representation contract]
