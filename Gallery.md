@@ -9,7 +9,7 @@ FSM_Serialization is the explicit byte boundary between domain meaning and binar
 - [README and one-minute tutorial](README.md) — install the planned 1.0.1 package and pack/unpack a value; the published baseline remains 1.0.0.
 - [Byte operations: a visual walkthrough](docs/BYTE_OPERATIONS.md) — follow the forward and reverse byte paths.
 - [Theory and boundaries](docs/THEORY.md) — why representation, storage, transport, and domain semantics remain separate.
-- [Serialization domain inventory](docs/SERIALIZATION_DOMAIN.md) — implemented responsibilities, non-goals, and format-owner obligations.
+- [Serialization domain inventory](docs/SERIALIZATION_DOMAIN.md) — implemented responsibilities, non-goals, and format-owner obligations.\n- [Test matrix and domain roadmap](docs/TEST_MATRIX.md) — test layers, FSM snapshot questions, security/resource concerns, and benchmark acceptance gates.
 - [1.0.1 candidate release notes](docs/RELEASE_NOTES_1.0.1.md) — planned patch scope and release gates.
 - [Benchmarking](docs/BENCHMARKING.md) — performance claims and how to reproduce measurements, where available.
 - [API class diagrams](docs/UML/) — focused contract diagrams and use cases.
