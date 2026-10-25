@@ -52,8 +52,45 @@ These are intentionally not implied by the current API:
 
 Those concerns may be implemented by a higher layer or a future separately designed component if a concrete use case justifies it. They should not be inferred from the small byte contracts.
 
+## Domain coverage matrix
+
+The inventory above is the package's current boundary, not a claim that every serialization feature should be implemented here. The wider FSM serialization domain should be explored explicitly and assigned to the correct architectural owner.
+
+| Domain area | Questions that must be answered | Current disposition |
+|---|---|---|
+| Byte-stream contract | What do read counts, empty buffers, position, length, flush, and disposal mean? | Implemented by the two stream adapters; exercise edge cases in unit tests. |
+| Partial I/O | Can one read return fewer bytes than requested without reaching EOF? | Contract permits short reads; each fixed-size parser must loop or deliberately reject the input. The quick-start example demonstrates the loop. |
+| Format definition | Field order, numeric width, signedness, byte order, text encoding, framing, and lengths? | Owned by the domain type/protocol; no universal format is imposed here. |
+| Round-trip semantics | Which semantic fields must survive Pack → bytes → Unpack? Which runtime-only values must not? | Example integer round trip exists; real FSM snapshot contracts remain to be defined by a consuming domain. |
+| Determinism/canonicalization | Do equivalent values produce identical bytes? How are unordered collections sorted? | Not guaranteed by the primitive; format-specific invariant and tests required. |
+| Malformed input | How are truncation, invalid tags, invalid enums, impossible lengths, duplicates, unknown fields, and trailing bytes handled? | Truncation is demonstrated in the example type; broader parser behavior is domain-owned and needs representative format tests. |
+| Resource/abuse limits | What maximum lengths, nesting, counts, and allocations are permitted for untrusted bytes? | No format parser or size-limit policy is provided by this package. A concrete format must define limits before consuming untrusted data. |
+| Versioning/evolution | How are format version, semantic version, and dependency version distinguished? What are the old-reader/new-writer rules? | Theory documented; no schema registry or migration engine implemented. |
+| Mutation/atomicity | Can failed Unpack leave partially modified state? Is parse-then-apply required? | Domain-owned decision; transactional rollback is not provided by the primitive. |
+| FSM state vs. definition | Are we persisting a live runtime snapshot, a blueprint/definition, transition history, or a composition manifest? Which runtime handles and external resources are intentionally excluded? | Open domain-design question for FSM_API/FSM_COS consumers; must not be guessed by the primitive library. |
+| Stream ownership | Who disposes the wrapped stream? Is the adapter owning or non-owning? | Current `StreamBinaryStream` owns and disposes the supplied stream; covered by a test. |
+| Concurrency | May one stream be read/written concurrently? Is snapshot capture consistent with a running FSM? | No thread-safety or snapshot synchronization guarantee is provided. Higher-level coordination is required. |
+| Storage and transport | File, blob, database, network, compression, encryption, checksums, signatures? | Explicit non-goals here; separate layers may compose these concerns around the byte boundary. |
+| Performance | Where are time, allocation, copying, and buffer growth spent at representative FSM sizes? | Separate BenchmarkDotNet evidence exists for stream primitives; FSM workload comparisons must be reproducible and tied to exact workload/commit. |
+| Compatibility/interoperability | Can other runtimes/languages read the format? Are golden byte fixtures stable? | No cross-language wire-format guarantee yet; add golden fixtures when a concrete format is selected. |
+| Property/fuzz testing | Do generated valid values round-trip? Do arbitrary malformed byte sequences fail safely and within resource limits? | Not yet established as a systematic suite; high-priority follow-up for concrete parsers. |
+
+## Test strategy and acceptance evidence
+
+The next test expansion should be driven by this matrix rather than by a target test count. For each concrete format, require:
+
+1. **Golden bytes** for a small, human-auditable value, so byte order and field layout cannot drift silently.
+2. **Round-trip properties** across boundary values, empty collections, optional fields, and representative FSM graph sizes.
+3. **Malformed-input cases** for truncation at every field boundary, invalid tags/versions, oversized lengths, and trailing bytes according to the format policy.
+4. **Compatibility fixtures** produced by earlier versions when durable bytes are expected to survive upgrades.
+5. **Allocation/performance measurements** for empty, typical, and stress-sized payloads; report throughput and allocations as well as elapsed time.
+6. **Security/resource assertions** that malformed or hostile input cannot request unbounded allocation or excessive work.
+7. **Domain ownership tests** that distinguish FSM definition/blueprint data from live runtime state, handles, caches, and external resources.
+
+Coverage is a diagnostic, not a completeness score. A small primitive can reach 100% executable line/branch coverage while leaving most format-level questions unimplemented. Do not add a generic schema, migration, compression, or persistence API merely to fill a matrix cell; first identify a real consumer and place the responsibility at the correct layer.
+
 ## Current verification evidence
 
-The CI test artifact for commit `0669623b83a7534513385afe3a2a47fd70c1b9d6` reports **17 tests passed, 0 failed**, with 100% line coverage (31/31 lines) and 100% branch coverage (4/4 branches) for the current assembly. Tests cover in-memory stream basics, initial-data copying, seeking/overwriting, adapter capability and byte/position delegation, unsupported underlying operations, null rejection, wrapped-stream disposal, short-read propagation, a little-endian integer round trip, and truncated input. This is strong coverage of the current small API, not exhaustive proof of every format concern listed above.
+The last inspected baseline artifact, from commit `bda04a33acac3717f326a82ddb31596ae5bfc908` in [CI run 40163849434](https://github.com/TrentBest/TheSingularityWorkshop.FSM_Serialization/actions/runs/40163849434), reports **17 tests passed, 0 failed**, with 100% line coverage (31/31 lines) and 100% branch coverage (4/4 branches) for the then-current assembly. That is full executable coverage of the small baseline, not exhaustive proof of the domain matrix above.
 
-The latest package audit also found that source-adjacent companion Markdown was not yet included in the packed package and that the internal branch-reconciliation ledger was included unintentionally. The packaging correction is now in `development`; the next CI artifact must be inspected to confirm both outcomes.
+The current development branch is expanding tests around empty-buffer behavior, seeking beyond the current end, invalid positions, disposal, flush delegation, and parsing fixed-size fields across multiple short reads. These changes require a fresh CI run before their test count or coverage is reported as verified.
