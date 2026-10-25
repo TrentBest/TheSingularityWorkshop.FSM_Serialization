@@ -25,6 +25,10 @@ The current ref comparison is `development` 80 commits ahead and 4 commits behin
 
 The first three changes are functionally superseded or intentionally adapted by the current development version; the shared documentation-standard link is retained explicitly. Do not treat the numeric ahead/behind count as proof that the branch diffs are identical; re-check after the final documentation commit.
 
+## Package artifact follow-up
+
+A fresh inspection of workflow run `40163607694` confirmed that `dotnet pack` generated both the version 1.0.1 `.nupkg` and `.snupkg`, but the workflow artifact glob (`./artifacts/*.nupkg`) uploaded only the primary package. The active `.github/workflows/build.yml` now explicitly uploads both extensions. The next run must confirm both files are in the artifact; the guarded publish job can then download both into the same folder, allowing NuGet's documented push behavior to publish the main package followed by its matching symbol package. This does not authorize or trigger publication.
+
 ## Documentation work now on development
 
 - Root `Gallery.md` (also included in the NuGet package).
