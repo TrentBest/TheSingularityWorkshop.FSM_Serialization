@@ -129,9 +129,9 @@ FSM_Serialization does not decide when to save, where to store bytes, how to tra
 
 ## 🟪 05 Documentation and theory
 
-[60-second quick start](#60-second-quick-start) · [Core API](#core-api) · [Stream implementations](#stream-implementations) · [Gallery](Gallery.md) · [Serialization domain inventory](docs/SERIALIZATION_DOMAIN.md) · [Byte operations](docs/BYTE_OPERATIONS.md) · [UML](docs/UML/README.md) · [Benchmarking](docs/BENCHMARKING.md) · [1.0.1 candidate notes](docs/RELEASE_NOTES_1.0.1.md)
+[60-second quick start](#60-second-quick-start) · [Core API](#core-api) · [Stream implementations](#stream-implementations) · [Gallery](Gallery.md) · [Serialization domain inventory](docs/SERIALIZATION_DOMAIN.md) · [Test matrix and roadmap](docs/TEST_MATRIX.md) · [Byte operations](docs/BYTE_OPERATIONS.md) · [UML](docs/UML/README.md) · [Benchmarking](docs/BENCHMARKING.md) · [1.0.1 candidate notes](docs/RELEASE_NOTES_1.0.1.md)
 
-[Gallery and living diagrams](Gallery.md) · [Serialization domain inventory](docs/SERIALIZATION_DOMAIN.md) · [Animated byte operations](docs/BYTE_OPERATIONS.md) · [UML class cards](docs/UML/README.md) · [Benchmarking](docs/BENCHMARKING.md)
+[Gallery and living diagrams](Gallery.md) · [Serialization domain inventory](docs/SERIALIZATION_DOMAIN.md) · [Test matrix and roadmap](docs/TEST_MATRIX.md) · [Animated byte operations](docs/BYTE_OPERATIONS.md) · [UML class cards](docs/UML/README.md) · [Benchmarking](docs/BENCHMARKING.md)
 
 ### Watch the two directions
 
