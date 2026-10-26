@@ -1,3 +1,10 @@
+<!-- The Singularity Workshop moniker -->
+<p align="center">
+  <a href="https://github.com/TrentBest">
+    <img src="https://raw.githubusercontent.com/TrentBest/TheSingularityWorkshop.Visualize/development/docs/assets/moniker.svg" alt="The Singularity Workshop animated moniker" width="720" />
+  </a>
+</p>
+
 # Release Notes — 1.0.1 candidate
 
 **Status:** candidate on `development`; not published. NuGet publication requires explicit release approval.
@@ -39,3 +46,12 @@ The reported roughly 21% FSM_COS/Simple Demos stress-test improvement is treated
 - The README's verification badge points to the actual `.github/workflows/build.yml`. The shared Workshop Documentation Standard reference from `master` has been preserved in the active README.
 - The branch ledger now records the four `master`-only commits and their disposition. Final branch comparison and a fresh CI run/package inspection are still required after the documentation reconciliation commits.
 - Keep publication gated until the repository owner explicitly approves release.
+\n\n## Documentation addition\n\n- Added a source-backed [domain completeness review](DOMAIN_COMPLETENESS.md) that separates implemented primitive contracts from missing consumer-format evidence.\n
+
+---
+
+<p align="center">
+  <a href="https://github.com/TrentBest/FSM_API">
+    <img src="https://raw.githubusercontent.com/TrentBest/FSM_API/master/Documentation/Branding/TheSingularityWorkshop.png" alt="The Singularity Workshop avatar" width="160" />
+  </a>
+</p>
