@@ -1,4 +1,11 @@
-# Byte Operations: From Meaning to Bytes and Back
+<!-- The Singularity Workshop moniker -->
+<p align="center">
+  <a href="https://github.com/TrentBest">
+    <img src="https://raw.githubusercontent.com/TrentBest/TheSingularityWorkshop.Visualize/development/docs/assets/moniker.svg" alt="The Singularity Workshop animated moniker" width="720" />
+  </a>
+</p>
+
+# Byte Operations: From Meaning to Bytes and Back\n\nFor the broader coverage assessment and unresolved responsibilities, see the [domain completeness review](DOMAIN_COMPLETENESS.md).
 
 This page follows the two directions independently. Packing and unpacking are separate capabilities; the combined interface is only a convenience for a type that supports both.
 
@@ -59,3 +66,12 @@ These are not universal features automatically supplied by FSM_Serialization. Th
 ## Source-backed proof
 
 The current test suite exercises memory-stream initialization and copying, read/write round trips, seeking and overwriting, adapter capability/byte/position delegation, short reads, wrapped-stream disposal, null arguments, a successful integer round trip, and truncated input. The additional regression tests explicitly exercise short reads, position delegation, and unsupported capabilities; the latest CI result remains the release gate for these changes. This is evidence for the current API—not a claim that every listed format concern is implemented or tested.
+
+
+---
+
+<p align="center">
+  <a href="https://github.com/TrentBest/FSM_API">
+    <img src="https://raw.githubusercontent.com/TrentBest/FSM_API/master/Documentation/Branding/TheSingularityWorkshop.png" alt="The Singularity Workshop avatar" width="160" />
+  </a>
+</p>
