@@ -5,7 +5,9 @@
   </a>
 </p>
 
-# FSM_Serialization Benchmarking\n\nBenchmarks establish cost, not domain completeness. See the [domain completeness review](DOMAIN_COMPLETENESS.md) for the missing semantic formats and the evidence required before adding domain-level performance claims.
+# FSM_Serialization Benchmarking
+
+Benchmarks establish cost, not domain completeness. See the [domain completeness review](DOMAIN_COMPLETENESS.md) for the missing semantic formats and the evidence required before adding domain-level performance claims.
 
 The serialization package has an executable companion benchmark project:
 
