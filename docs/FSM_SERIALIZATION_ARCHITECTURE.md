@@ -5,7 +5,9 @@
   </a>
 </p>
 
-For the current source-backed coverage assessment and prioritized missing evidence, see the [domain completeness review](DOMAIN_COMPLETENESS.md).\n\n# FSM-Aware Serialization Architecture and Proof Plan
+# FSM-Aware Serialization Architecture and Proof Plan
+
+For the current source-backed coverage assessment and prioritized missing evidence, see the [domain completeness review](DOMAIN_COMPLETENESS.md).
 
 **Status:** architecture proposal and acceptance plan. This document does not claim the FSM-specific codec is implemented or benchmark-proven.
 
