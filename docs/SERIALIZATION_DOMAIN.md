@@ -1,3 +1,10 @@
+<!-- The Singularity Workshop moniker -->
+<p align="center">
+  <a href="https://github.com/TrentBest">
+    <img src="https://raw.githubusercontent.com/TrentBest/TheSingularityWorkshop.Visualize/development/docs/assets/moniker.svg" alt="The Singularity Workshop animated moniker" width="720" />
+  </a>
+</p>
+
 # Serialization Domain Inventory
 
 **Status:** source-backed inventory for the next package review. This document distinguishes implemented primitives from responsibilities that remain with the domain or format owner.
@@ -89,8 +96,17 @@ The next test expansion should be driven by this matrix rather than by a target 
 
 Coverage is a diagnostic, not a completeness score. A small primitive can reach 100% executable line/branch coverage while leaving most format-level questions unimplemented. Do not add a generic schema, migration, compression, or persistence API merely to fill a matrix cell; first identify a real consumer and place the responsibility at the correct layer.
 
-## Current verification evidence
+## Domain completeness assessment\n\nSee the [domain completeness review](DOMAIN_COMPLETENESS.md) for a cross-cutting assessment of implemented responsibilities, consumer-level gaps, and recommended work order. The inventory below remains the source-backed description of current package behavior; the review distinguishes that behavior from capabilities that still require a real format owner.\n\n## Current verification evidence
 
 The last inspected baseline artifact, from commit `bda04a33acac3717f326a82ddb31596ae5bfc908` in [CI run 40163849434](https://github.com/TrentBest/TheSingularityWorkshop.FSM_Serialization/actions/runs/40163849434), reports **17 tests passed, 0 failed**, with 100% line coverage (31/31 lines) and 100% branch coverage (4/4 branches) for the then-current assembly. That is full executable coverage of the small baseline, not exhaustive proof of the domain matrix above.
 
 The current development branch now includes those stream-edge tests plus a little-endian golden-byte fixture, Int32 boundary round trips, rejection of every truncated prefix of the example field, and a quick-start implementation that loops across partial reads. CI now enforces minimum 90% line coverage and 85% branch coverage. A fresh successful run is still required before reporting the expanded suite's count or coverage as verified. See [the test matrix and domain roadmap](TEST_MATRIX.md) for the staged plan.
+
+
+---
+
+<p align="center">
+  <a href="https://github.com/TrentBest/FSM_API">
+    <img src="https://raw.githubusercontent.com/TrentBest/FSM_API/master/Documentation/Branding/TheSingularityWorkshop.png" alt="The Singularity Workshop avatar" width="160" />
+  </a>
+</p>
