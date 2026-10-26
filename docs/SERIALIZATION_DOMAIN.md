@@ -96,7 +96,11 @@ The next test expansion should be driven by this matrix rather than by a target 
 
 Coverage is a diagnostic, not a completeness score. A small primitive can reach 100% executable line/branch coverage while leaving most format-level questions unimplemented. Do not add a generic schema, migration, compression, or persistence API merely to fill a matrix cell; first identify a real consumer and place the responsibility at the correct layer.
 
-## Domain completeness assessment\n\nSee the [domain completeness review](DOMAIN_COMPLETENESS.md) for a cross-cutting assessment of implemented responsibilities, consumer-level gaps, and recommended work order. The inventory below remains the source-backed description of current package behavior; the review distinguishes that behavior from capabilities that still require a real format owner.\n\n## Current verification evidence
+## Domain completeness assessment
+
+See the [domain completeness review](DOMAIN_COMPLETENESS.md) for a cross-cutting assessment of implemented responsibilities, consumer-level gaps, and recommended work order. The inventory below remains the source-backed description of current package behavior; the review distinguishes that behavior from capabilities that still require a real format owner.
+
+## Current verification evidence
 
 The last inspected baseline artifact, from commit `bda04a33acac3717f326a82ddb31596ae5bfc908` in [CI run 40163849434](https://github.com/TrentBest/TheSingularityWorkshop.FSM_Serialization/actions/runs/40163849434), reports **17 tests passed, 0 failed**, with 100% line coverage (31/31 lines) and 100% branch coverage (4/4 branches) for the then-current assembly. That is full executable coverage of the small baseline, not exhaustive proof of the domain matrix above.
 
