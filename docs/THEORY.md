@@ -1,4 +1,11 @@
-# FSM_Serialization Theory
+<!-- The Singularity Workshop moniker -->
+<p align="center">
+  <a href="https://github.com/TrentBest">
+    <img src="https://raw.githubusercontent.com/TrentBest/TheSingularityWorkshop.Visualize/development/docs/assets/moniker.svg" alt="The Singularity Workshop animated moniker" width="720" />
+  </a>
+</p>
+
+# FSM_Serialization Theory\n\nFor a source-backed assessment of current implementation coverage and missing consumer-level evidence, see the [domain completeness review](DOMAIN_COMPLETENESS.md).
 
 ## 1. The central distinction
 
@@ -728,3 +735,12 @@ This project is part of a deliberately troublesome ecosystem:
 - **[WebPage](https://github.com/TrentBest/WebPage)** — browser manifestation and proving ground.
 
 <p align="center"><em>The Singularity Workshop — Tools for the curious, the bold, and the systemically inclined.</em><br><strong>Because state shouldn't be a mess.</strong><br><em>And because static boundaries are invitations to cause trouble.</em></p>
+
+
+---
+
+<p align="center">
+  <a href="https://github.com/TrentBest/FSM_API">
+    <img src="https://raw.githubusercontent.com/TrentBest/FSM_API/master/Documentation/Branding/TheSingularityWorkshop.png" alt="The Singularity Workshop avatar" width="160" />
+  </a>
+</p>
