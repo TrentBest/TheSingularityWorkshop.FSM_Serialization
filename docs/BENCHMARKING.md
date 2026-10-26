@@ -1,4 +1,11 @@
-# FSM_Serialization Benchmarking
+<!-- The Singularity Workshop moniker -->
+<p align="center">
+  <a href="https://github.com/TrentBest">
+    <img src="https://raw.githubusercontent.com/TrentBest/TheSingularityWorkshop.Visualize/development/docs/assets/moniker.svg" alt="The Singularity Workshop animated moniker" width="720" />
+  </a>
+</p>
+
+# FSM_Serialization Benchmarking\n\nBenchmarks establish cost, not domain completeness. See the [domain completeness review](DOMAIN_COMPLETENESS.md) for the missing semantic formats and the evidence required before adding domain-level performance claims.
 
 The serialization package has an executable companion benchmark project:
 
@@ -260,3 +267,12 @@ Do not combine the mature serializers' dependencies with the production core mer
 7. Summarize per-workload winners and crossover points; avoid naming one universal winner if the results differ by graph size or shape.
 
 No technique should be described as faster until the measured suite demonstrates it. The purpose is to establish a reproducible evidence base, including negative results, before choosing the production wire format.
+
+
+---
+
+<p align="center">
+  <a href="https://github.com/TrentBest/FSM_API">
+    <img src="https://raw.githubusercontent.com/TrentBest/FSM_API/master/Documentation/Branding/TheSingularityWorkshop.png" alt="The Singularity Workshop avatar" width="160" />
+  </a>
+</p>
