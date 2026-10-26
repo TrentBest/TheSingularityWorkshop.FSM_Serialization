@@ -54,7 +54,7 @@ Choose **View → Terminal** and make sure it is in the directory containing you
 ### 3. Install the published package
 
 ```powershell
-dotnet add package TheSingularityWorkshop.FSM_Serialization --version 1.0.1
+dotnet add package TheSingularityWorkshop.FSM_Serialization --version 1.0.0
 ```
 
 ### 4. Replace `Program.cs` with this complete example
@@ -120,18 +120,26 @@ The stream provides the byte-level mechanism. `ExampleState` defines which value
 Already have an application? Add the package to the project that owns the type whose representation you want to control:
 
 ```powershell
-dotnet add package TheSingularityWorkshop.FSM_Serialization --version 1.0.1
+dotnet add package TheSingularityWorkshop.FSM_Serialization --version 1.0.0
 ```
 
 Implement `IBinarySerializable` (or the narrower pack/unpack contract appropriate to your use) on the domain-owned type, then pass an `IBinaryStream` supplied by the package. Keep the field order, widths, byte order, string encoding, and versioning rules in the type or domain contract that owns the data.
 
 FSM_Serialization does not decide when to save, where to store bytes, how to transport them, or what a field means. Your existing persistence, storage, transport, and application layers remain yours.
 
-## 🟪 05 Documentation and theory
+## 🟪 05 Available documentation and theory
 
-[60-second quick start](#60-second-quick-start) · [Core API](#core-api) · [Stream implementations](#stream-implementations) · [Gallery](Gallery.md) · [Serialization domain inventory](docs/SERIALIZATION_DOMAIN.md) · [Test matrix and roadmap](docs/TEST_MATRIX.md) · [Byte operations](docs/BYTE_OPERATIONS.md) · [UML](docs/UML/README.md) · [Benchmarking](docs/BENCHMARKING.md) · [1.0.1 candidate notes](docs/RELEASE_NOTES_1.0.1.md)
+Start with the page that matches the question:
 
-[Gallery and living diagrams](Gallery.md) · [Serialization domain inventory](docs/SERIALIZATION_DOMAIN.md) · [Test matrix and roadmap](docs/TEST_MATRIX.md) · [Animated byte operations](docs/BYTE_OPERATIONS.md) · [UML class cards](docs/UML/README.md) · [Benchmarking](docs/BENCHMARKING.md)
+- [Serialization domain inventory](docs/SERIALIZATION_DOMAIN.md) — what the primitive package implements and what remains with format owners.
+- [Domain completeness review](docs/DOMAIN_COMPLETENESS.md) — coverage assessment, missing evidence, and the recommended order of work.
+- [Test matrix and domain roadmap](docs/TEST_MATRIX.md) — acceptance gates from stream contracts to concrete formats and FSM integration.
+- [Byte operations](docs/BYTE_OPERATIONS.md) — visual walkthrough of packing and unpacking.
+- [Theory](docs/THEORY.md) — representation versus meaning, storage, transport, determinism, and compatibility.
+- [UML index](docs/UML/README.md) — class diagrams, neighborhoods, sequences, use cases, architecture, and data models.
+- [Benchmarking](docs/BENCHMARKING.md) — historical results, methodology, and the path toward semantic FSM benchmarks.
+- [Gallery](Gallery.md) — visual resources and evidence links.
+- [1.0.1 candidate notes](docs/RELEASE_NOTES_1.0.1.md) — proposed patch scope; not a publication announcement.
 
 ### Watch the two directions
 
@@ -260,13 +268,13 @@ The point is to provide a **small representation boundary** that higher-level sy
 ### .NET CLI
 
 ~~~bash
-dotnet add package TheSingularityWorkshop.FSM_Serialization --version 1.0.1
+dotnet add package TheSingularityWorkshop.FSM_Serialization --version 1.0.0
 ~~~
 
 ### PackageReference
 
 ~~~xml
-<PackageReference Include="TheSingularityWorkshop.FSM_Serialization" Version="1.0.1" />
+<PackageReference Include="TheSingularityWorkshop.FSM_Serialization" Version="1.0.0" />
 ~~~
 
 The package is available from [NuGet.org](https://www.nuget.org/packages/TheSingularityWorkshop.FSM_Serialization/).
@@ -1194,5 +1202,9 @@ This project is part of a deliberately troublesome ecosystem:
 - **[WebPage](https://github.com/TrentBest/WebPage)** — browser manifestation and proving ground.
 
 <p align="center">
-  <a href="https://github.com/TrentBest/WebPage" aria-label="Visit The Singularity Workshop"><img src="https://raw.githubusercontent.com/TrentBest/WebPage/development/TheSingularityWorkshop/wwwroot/Images/TheSingularityWorkshopLivingAvatar.svg" alt="The Singularity Workshop living avatar — a digital vortex of information converging on its central eye" width="112" /></a><br />
-<em>The Singularity Workshop — Tools for the curious, the bold, and the systemically inclined.</em><br><strong>Because state shouldn't be a mess.</strong><br><em>And because static boundaries are invitations to cause trouble.</em>
+  <a href="https://github.com/TrentBest">
+    <img src="https://raw.githubusercontent.com/TrentBest/FSM_API/master/Documentation/Branding/TheSingularityWorkshop.png" alt="The Singularity Workshop avatar" width="160" />
+  </a><br />
+  <em>The Singularity Workshop — Tools for the curious, the bold, and the systemically inclined.</em><br />
+  <strong>Because state shouldn't be a mess.</strong>
+</p>
