@@ -9,7 +9,11 @@
 
 **Purpose:** turn the serialization domain inventory into an evidence plan. This matrix separates tests that belong in the primitive package from tests that require a concrete FSM or FSM_COS format owner.
 
-## Reading this matrix\n\nUse the [domain completeness review](DOMAIN_COMPLETENESS.md) for the current coverage assessment and prioritized gaps. This matrix is the evidence plan: it identifies what must be proven at each layer and where the responsibility belongs.\n\n## Current package boundary
+## Reading this matrix
+
+Use the [domain completeness review](DOMAIN_COMPLETENESS.md) for the current coverage assessment and prioritized gaps. This matrix is the evidence plan: it identifies what must be proven at each layer and where the responsibility belongs.
+
+## Current package boundary
 
 The implementation currently contains three contracts and two stream adapters:
 
