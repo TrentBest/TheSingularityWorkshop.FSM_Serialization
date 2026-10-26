@@ -1,4 +1,11 @@
-# FSM-Aware Serialization Architecture and Proof Plan
+<!-- The Singularity Workshop moniker -->
+<p align="center">
+  <a href="https://github.com/TrentBest">
+    <img src="https://raw.githubusercontent.com/TrentBest/TheSingularityWorkshop.Visualize/development/docs/assets/moniker.svg" alt="The Singularity Workshop animated moniker" width="720" />
+  </a>
+</p>
+
+For the current source-backed coverage assessment and prioritized missing evidence, see the [domain completeness review](DOMAIN_COMPLETENESS.md).\n\n# FSM-Aware Serialization Architecture and Proof Plan
 
 **Status:** architecture proposal and acceptance plan. This document does not claim the FSM-specific codec is implemented or benchmark-proven.
 
@@ -152,3 +159,12 @@ The existing SimpleDemos FSM_API vs FSM_COS comparison showed a roughly 20.6% re
 - That a wire format is stable before golden fixtures and compatibility policy are approved.
 
 The proof target is not “more tests” or “a clever binary layout.” It is a deterministic, safe FSM definition codec with semantic tests and reproducible benchmarks showing where it wins, where it loses, and why.
+
+
+---
+
+<p align="center">
+  <a href="https://github.com/TrentBest/FSM_API">
+    <img src="https://raw.githubusercontent.com/TrentBest/FSM_API/master/Documentation/Branding/TheSingularityWorkshop.png" alt="The Singularity Workshop avatar" width="160" />
+  </a>
+</p>
