@@ -5,7 +5,9 @@
   </a>
 </p>
 
-# FSM_Serialization Theory\n\nFor a source-backed assessment of current implementation coverage and missing consumer-level evidence, see the [domain completeness review](DOMAIN_COMPLETENESS.md).
+# FSM_Serialization Theory
+
+For a source-backed assessment of current implementation coverage and missing consumer-level evidence, see the [domain completeness review](DOMAIN_COMPLETENESS.md).
 
 ## 1. The central distinction
 
