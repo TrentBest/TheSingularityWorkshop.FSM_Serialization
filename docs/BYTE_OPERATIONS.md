@@ -5,7 +5,9 @@
   </a>
 </p>
 
-# Byte Operations: From Meaning to Bytes and Back\n\nFor the broader coverage assessment and unresolved responsibilities, see the [domain completeness review](DOMAIN_COMPLETENESS.md).
+# Byte Operations: From Meaning to Bytes and Back
+
+For the broader coverage assessment and unresolved responsibilities, see the [domain completeness review](DOMAIN_COMPLETENESS.md).
 
 This page follows the two directions independently. Packing and unpacking are separate capabilities; the combined interface is only a convenience for a type that supports both.
 
