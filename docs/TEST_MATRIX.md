@@ -1,8 +1,15 @@
+<!-- The Singularity Workshop moniker -->
+<p align="center">
+  <a href="https://github.com/TrentBest">
+    <img src="https://raw.githubusercontent.com/TrentBest/TheSingularityWorkshop.Visualize/development/docs/assets/moniker.svg" alt="The Singularity Workshop animated moniker" width="720" />
+  </a>
+</p>
+
 # FSM_Serialization Test Matrix and Domain Roadmap
 
 **Purpose:** turn the serialization domain inventory into an evidence plan. This matrix separates tests that belong in the primitive package from tests that require a concrete FSM or FSM_COS format owner.
 
-## Current package boundary
+## Reading this matrix\n\nUse the [domain completeness review](DOMAIN_COMPLETENESS.md) for the current coverage assessment and prioritized gaps. This matrix is the evidence plan: it identifies what must be proven at each layer and where the responsibility belongs.\n\n## Current package boundary
 
 The implementation currently contains three contracts and two stream adapters:
 
@@ -99,3 +106,12 @@ The decision output should distinguish: end-to-end FSM_COS improvement, serializ
 ## Governing rule
 
 **Explore the whole domain; implement only the responsibility that belongs at this layer.** A domain gap should produce an explicit design decision, test, consumer requirement, or deferred item—not an accidental expansion of the primitive package.
+
+
+---
+
+<p align="center">
+  <a href="https://github.com/TrentBest/FSM_API">
+    <img src="https://raw.githubusercontent.com/TrentBest/FSM_API/master/Documentation/Branding/TheSingularityWorkshop.png" alt="The Singularity Workshop avatar" width="160" />
+  </a>
+</p>
