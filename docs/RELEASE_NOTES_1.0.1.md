@@ -46,7 +46,12 @@ The reported roughly 21% FSM_COS/Simple Demos stress-test improvement is treated
 - The README's verification badge points to the actual `.github/workflows/build.yml`. The shared Workshop Documentation Standard reference from `master` has been preserved in the active README.
 - The branch ledger now records the four `master`-only commits and their disposition. Final branch comparison and a fresh CI run/package inspection are still required after the documentation reconciliation commits.
 - Keep publication gated until the repository owner explicitly approves release.
-\n\n## Documentation addition\n\n- Added a source-backed [domain completeness review](DOMAIN_COMPLETENESS.md) that separates implemented primitive contracts from missing consumer-format evidence.\n
+
+
+## Documentation addition
+
+- Added a source-backed [domain completeness review](DOMAIN_COMPLETENESS.md) that separates implemented primitive contracts from missing consumer-format evidence.
+
 
 ---
 
