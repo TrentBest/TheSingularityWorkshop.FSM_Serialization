@@ -125,8 +125,18 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p artifacts
-          dotnet run --project samples/TheSingularityWorkshop.CiAi.ObserveRun --configuration Release --no-build -- "$TARGET_REPOSITORY" "$TARGET_SHA" artifacts/commit-observation.json
           evaluator_sha="$(git -C . rev-parse HEAD)"
+          # A policy failure is valid evidence, not a reason to skip provenance.
+          # Preserve the observer's exit code and return it only after provenance is written.
+          set +e
+          dotnet run --project samples/TheSingularityWorkshop.CiAi.ObserveRun --configuration Release --no-build -- "$TARGET_REPOSITORY" "$TARGET_SHA" artifacts/commit-observation.json
+          observer_exit_code=$?
+          set -e
+          case "$observer_exit_code" in
+            0) observer_outcome="passing" ;;
+            3) observer_outcome="policy-nonpassing" ;;
+            *) observer_outcome="observer-error" ;;
+          esac
           jq -n \
             --arg sourceRepository "$TARGET_REPOSITORY" \
             --arg sourceSha "$TARGET_SHA" \
@@ -138,8 +148,11 @@ jobs:
             --arg ciaiEvaluatorSha "$evaluator_sha" \
             --arg shadowRunId "${{ github.run_id }}" \
             --arg shadowRunAttempt "${{ github.run_attempt }}" \
-            '{schema:"ciai.serialization-shadow-host.v1",sourceRepository:$sourceRepository,sourceSha:$sourceSha,baselineRunId:($baselineRunId|tonumber),baselineRunAttempt:($baselineRunAttempt|tonumber),baselineConclusion:$baselineConclusion,baselineUrl:$baselineUrl,ciaiRepository:$ciaiRepository,ciaiEvaluatorSha:$ciaiEvaluatorSha,shadowRunId:($shadowRunId|tonumber),shadowRunAttempt:($shadowRunAttempt|tonumber),mode:"shadow-only",publicationAuthorized:false}' \
+            --arg observerExitCode "$observer_exit_code" \
+            --arg observerOutcome "$observer_outcome" \
+            '{schema:"ciai.serialization-shadow-host.v2",sourceRepository:$sourceRepository,sourceSha:$sourceSha,baselineRunId:($baselineRunId|tonumber),baselineRunAttempt:($baselineRunAttempt|tonumber),baselineConclusion:$baselineConclusion,baselineUrl:$baselineUrl,ciaiRepository:$ciaiRepository,ciaiEvaluatorSha:$ciaiEvaluatorSha,shadowRunId:($shadowRunId|tonumber),shadowRunAttempt:($shadowRunAttempt|tonumber),observerExitCode:($observerExitCode|tonumber),observerOutcome:$observerOutcome,mode:"shadow-only",publicationAuthorized:false}' \
             > artifacts/shadow-host-provenance.json
+          exit "$observer_exit_code"
 
       - name: Upload raw shadow evidence
         if: ${{ always() }}
