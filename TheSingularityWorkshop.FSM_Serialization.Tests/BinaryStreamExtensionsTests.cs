@@ -48,6 +48,16 @@ public sealed class BinaryStreamExtensionsTests
         Assert.Throws<ArgumentNullException>(() => stream.ReadExactly(Span<byte>.Empty));
     }
 
+    [Theory]
+    [InlineData(-1)]
+    [InlineData(5)]
+    public void ReadExactlyRejectsInvalidReadCounts(int readCount)
+    {
+        using var stream = new InvalidReadCountStream(readCount);
+
+        Assert.Throws<IOException>(() => stream.ReadExactly(new byte[4]));
+    }
+
     private sealed class OneByteAtATimeStream : MemoryStream
     {
         public OneByteAtATimeStream(byte[] bytes) : base(bytes)
@@ -56,5 +66,26 @@ public sealed class BinaryStreamExtensionsTests
 
         public override int Read(Span<byte> buffer)
             => base.Read(buffer[..Math.Min(1, buffer.Length)]);
+    }
+
+    private sealed class InvalidReadCountStream(int readCount) : IBinaryStream
+    {
+        public bool CanRead => true;
+        public bool CanWrite => false;
+        public long Position { get; set; }
+        public long Length => 0;
+
+        public int Read(Span<byte> buffer) => readCount;
+
+        public void Write(ReadOnlySpan<byte> buffer)
+            => throw new NotSupportedException();
+
+        public void Flush()
+        {
+        }
+
+        public void Dispose()
+        {
+        }
     }
 }
