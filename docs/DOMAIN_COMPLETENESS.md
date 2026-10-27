@@ -12,9 +12,9 @@
 
 ## Executive assessment
 
-**The primitive boundary is coherent; the broader serialization domain is not yet demonstrated complete.** The implementation is intentionally small: three pack/unpack contracts and two stream adapters. Current tests give useful evidence for byte fidelity, stream delegation, positioning, short reads, disposal, and one little-endian Int32 example.
+**The primitive boundary is coherent; the broader serialization domain is not yet demonstrated complete.** The implementation remains intentionally small: three pack/unpack contracts, two stream adapters, and a reusable exact-read extension. Current tests give useful evidence for byte fidelity, stream delegation, positioning, short reads, disposal, and one little-endian Int32 example.
 
-That proves the mechanics of the boundary, not the completeness of real Workshop formats. No production FSM definition, FSM_COS manifest, or runtime snapshot codec is established by the current primitive API and tests. Those are not automatically defects in this package: their schemas belong to their domain owners. They are, however, important missing consumer-level proof.
+That proves the mechanics of the boundary, including reusable exact reads, not the completeness of real Workshop formats. No production FSM definition, FSM_COS manifest, or runtime snapshot codec is established by the current primitive API and tests. Those are not automatically defects in this package: their schemas belong to their domain owners. They are, however, important missing consumer-level proof.
 
 The right target is **complete responsibility coverage across the owning layers**, not maximal API surface inside FSM_Serialization.
 
@@ -28,7 +28,7 @@ The right target is **complete responsibility coverage across the owning layers*
 | Byte stream contract | `IBinaryStream` | Implemented: capabilities, position, length, span read/write, flush, disposal. |
 | In-memory stream | `MemoryBinaryStream` | Implemented; initial data is copied and the position starts at zero. |
 | .NET stream adapter | `StreamBinaryStream` | Implemented; delegates operations and owns/disposes the wrapped stream. |
-| Short reads and truncated fixed-width fields | Test/example evidence | Partially covered. One example loops over short reads and rejects truncated Int32 input; this is not yet a reusable, library-wide exact-read primitive. |
+| Short reads and truncated fixed-width fields | `BinaryStreamExtensions.ReadExactly` plus contract tests | Implemented as a reusable loop that fills a caller-provided span across short reads and throws `EndOfStreamException` on premature end. It allocates no buffer and defines no field encoding. |
 | Primitive encodings beyond the example | Domain-owned code only | Not supplied as reusable codecs. Endianness, signedness, varints, strings, and length prefixes must be implemented and tested by each format owner. |
 | Structured collection and graph representation | No production codec evidenced | Missing consumer-level implementation/evidence: ordering, references, cycles where allowed, sparse IDs, forward references, and canonical output. |
 | FSM definition / blueprint format | No production codec evidenced | Missing. Define the semantic scope and byte contract in the owning FSM domain before implementing it. |
