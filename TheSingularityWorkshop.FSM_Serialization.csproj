@@ -9,8 +9,8 @@
     <Version>1.0.1</Version>
     <Authors>Trent Best</Authors>
     <Company>The Singularity Workshop</Company>
-    <Description>Binary serialization infrastructure for FSM ecosystem state, MicroBundle composition, Experience manifests, and lineage.</Description>
-    <PackageTags>FSM;FSM_COS;MicroBundle;Experience;serialization;binary;digital-reality</PackageTags>
+    <Description>Explicit byte-oriented serialization contracts and stream adapters for domain-owned binary representations.</Description>
+    <PackageTags>serialization;binary;stream;FSM;TheSingularityWorkshop</PackageTags>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/TrentBest/TheSingularityWorkshop.FSM_Serialization</PackageProjectUrl>
     <RepositoryUrl>https://github.com/TrentBest/TheSingularityWorkshop.FSM_Serialization</RepositoryUrl>
