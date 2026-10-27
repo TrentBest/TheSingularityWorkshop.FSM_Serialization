@@ -23,8 +23,9 @@ public sealed class BinaryStreamExtensionsTests
     [InlineData(3)]
     public void ReadExactlyThrowsWhenInputEndsBeforeBufferIsFull(int availableBytes)
     {
-        using var stream = new MemoryBinaryStream([1, 2, 3][..availableBytes]);
-        Span<byte> buffer = stackalloc byte[4];
+        byte[] completeInput = [1, 2, 3];
+        using var stream = new MemoryBinaryStream(completeInput[..availableBytes]);
+        byte[] buffer = new byte[4];
 
         Assert.Throws<EndOfStreamException>(() => stream.ReadExactly(buffer));
     }
