@@ -998,7 +998,7 @@ TheSingularityWorkshop.FSM_Serialization/
 │
 ├── .github/
 │   └── workflows/
-│       └── verify.yml
+│       └── build.yml
 │
 ├── docs/
 │   ├── THEORY.md
