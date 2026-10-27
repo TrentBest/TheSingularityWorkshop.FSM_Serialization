@@ -24,14 +24,20 @@ jobs:
         run: |
           set -euo pipefail
           payload="$(printf '{"event_type":"serialization-development-changed","client_payload":{"source_sha":"%s","source_ref":"%s"}}' "$SOURCE_SHA" "$SOURCE_REF")"
-          curl --fail-with-body --silent --show-error \
+          status="$(curl --silent --show-error --output dispatch-response.json --write-out '%{http_code}' \
             --request POST \
             --url "https://api.github.com/repos/TrentBest/FSM_Serialization_Benchmarks/dispatches" \
             --header "Accept: application/vnd.github+json" \
             --header "Authorization: Bearer $GH_TOKEN" \
             --header "X-GitHub-Api-Version: 2022-11-28" \
             --header "Content-Type: application/json" \
-            --data "$payload"
+            --data "$payload")"
+          if [[ "$status" != "204" ]]; then
+            echo "::error::Cross-repository benchmark dispatch failed with HTTP $status."
+            cat dispatch-response.json
+            exit 1
+          fi
+          echo "Dispatched exact source SHA $SOURCE_SHA to FSM_Serialization_Benchmarks."
 
       - name: Explain missing cross-repository token
         if: ${{ env.BENCHMARKS_DISPATCH_TOKEN == '' }}
