@@ -91,17 +91,7 @@ public sealed class ExampleState : IBinarySerializable
     public void Unpack(IBinaryStream stream)
     {
         Span<byte> buffer = stackalloc byte[sizeof(int)];
-        int totalRead = 0;
-
-        while (totalRead < buffer.Length)
-        {
-            int bytesRead = stream.Read(buffer[totalRead..]);
-            if (bytesRead == 0)
-                throw new EndOfStreamException();
-
-            totalRead += bytesRead;
-        }
-
+        stream.ReadExactly(buffer);
         Value = BinaryPrimitives.ReadInt32LittleEndian(buffer);
     }
 }
@@ -331,11 +321,17 @@ The abstraction intentionally does not expose filesystem paths, filenames, datab
 
 ### Read semantics
 
-Read returns the number of bytes actually read.
+Read returns the number of bytes actually read. A caller must not assume that one call fills the supplied buffer.
 
-A caller must not assume that one call necessarily fills the supplied buffer.
+Use the reusable `ReadExactly` extension when a format needs a complete fixed-width field:
 
-For fixed-width values, implementations should verify that the required number of bytes was received before interpreting the value.
+```csharp
+Span<byte> buffer = stackalloc byte[sizeof(int)];
+stream.ReadExactly(buffer);
+int value = BinaryPrimitives.ReadInt32LittleEndian(buffer);
+```
+
+`ReadExactly` loops across short reads and throws `EndOfStreamException` if input ends early. It does not choose an encoding or byte order; the format owner still does that.
 
 ~~~csharp
 Span<byte> buffer = stackalloc byte[sizeof(int)];
