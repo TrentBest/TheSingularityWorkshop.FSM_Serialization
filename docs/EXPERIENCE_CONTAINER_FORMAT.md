@@ -276,7 +276,7 @@ The following are explicit review items, not silently settled facts:
 3. Review signature coverage and algorithm policy with a cryptography/security reviewer.
 4. Confirm the proposed default size limits against expected Experience sizes and target devices.
 5. Confirm the ResourceIndex model and whether resources should use one section per resource or grouped payload blocks.
-6. Confirm whether non-seekable streams are in scope for the first reader.
+6. **Resolved for the initial reader:** version 1 requires a seekable input stream. The parser will not silently buffer or spool a non-seekable source; a host/repository layer may explicitly spool to a bounded temporary file when needed.
 7. Confirm section-ID generation/canonicalization rules for each repeated section type.
 8. Confirm whether IntegrityMetadata is required for all files or whether a clearly unsigned development profile is needed.
 
@@ -292,11 +292,12 @@ Until those decisions are reviewed, this document is a proposal, not a frozen pu
 - [FSM_COS #51 — immutable dependency pins](https://github.com/TrentBest/TheSingularityWorkshop.FSM_COS/issues/51)
 - [FSM_Foundry #23 — RuntimeAssembly execution contract](https://github.com/TrentBest/TheSingularityWorkshop.FSM_Foundry/issues/23)
 
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/TrentBest/FSM_API/master/Documentation/Branding/TheSingularityWorkshop.png" alt="The Singularity Workshop" width="360" />
+</p>
+
 ---
 
 **Publication and release:** this work is documentation/design only. It does not authorize package version changes, NuGet publication, release, deployment, merge, or changes to `master`.
 
-
-### Signature transcript clarification (required for review)
-
-The IntegrityMetadata section is excluded from the generic section-digest tuple to avoid a circular signature. That does **not** mean its security-relevant descriptor fields may be mutable without detection. Under proposed coverage profile 1, the canonical transcript MUST additionally include the IntegrityMetadata schema version, signature profile identifier, signature algorithm identifier, publisher/key identifier, and any algorithm parameters that affect verification. Only the signature value itself is excluded. The exact canonical encoding of these fields must be specified and covered by golden signing vectors before the profile is implemented. A parser must reject ambiguous or duplicate encodings of these fields.
