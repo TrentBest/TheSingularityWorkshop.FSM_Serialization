@@ -40,6 +40,50 @@ internal sealed class ExperienceContainerDirectory
         return VerifiedExperienceSectionStream.Open(source, _sourceGate, entry);
     }
 
+    /// <summary>Verifies every section digest and fully validates every compressed section payload.</summary>
+    /// <remarks>
+    /// This operation verifies content integrity and compression framing only. It does not validate
+    /// publisher signatures or establish publisher authenticity. The caller must keep the source
+    /// immutable and must not access it concurrently outside this directory's section-stream gate.
+    /// </remarks>
+    internal void VerifyAllSectionPayloads(
+        Stream source,
+        long maximumAggregateLogicalBytes = 1024L * 1024 * 1024)
+    {
+        ArgumentNullException.ThrowIfNull(source);
+        if (maximumAggregateLogicalBytes < 0)
+            throw new ArgumentOutOfRangeException(nameof(maximumAggregateLogicalBytes));
+
+        long aggregateLogicalBytes = 0;
+        foreach (ExperienceSectionEntry entry in Entries)
+        {
+            try
+            {
+                aggregateLogicalBytes = checked(aggregateLogicalBytes + entry.LogicalLength);
+            }
+            catch (OverflowException exception)
+            {
+                throw new InvalidDataException("Aggregate logical section length overflows.", exception);
+            }
+
+            if (aggregateLogicalBytes > maximumAggregateLogicalBytes)
+                throw new InvalidDataException("Aggregate logical section data exceeds its verification limit.");
+
+            using Stream section = entry.Compression switch
+            {
+                0 => OpenVerifiedSection(source, entry),
+                1 => OpenBrotliSection(source, entry, entry.LogicalLength),
+                _ => throw new InvalidDataException("The section uses an unsupported compression value.")
+            };
+
+            byte[] buffer = new byte[81920];
+            while (section.Read(buffer, 0, buffer.Length) != 0)
+            {
+                // Drain to completion so Brotli framing, exact logical length, and trailing bytes are checked.
+            }
+        }
+    }
+
     /// <summary>Verifies stored bytes, then returns a bounded incremental Brotli decoder for a compressed section.</summary>
     internal BrotliExperienceSectionStream OpenBrotliSection(
         Stream source,
