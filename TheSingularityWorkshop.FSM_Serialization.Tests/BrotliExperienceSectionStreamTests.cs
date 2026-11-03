@@ -47,6 +47,17 @@ public sealed class BrotliExperienceSectionStreamTests
     }
 
     [Fact]
+    public void ReadValidatesTrailingBytesBeforeReturningFinalLogicalChunk()
+    {
+        byte[] logical = Enumerable.Repeat((byte)7, 128).ToArray();
+        using var source = CreateSource(logical, out var entry, appendTrailingByte: true);
+        var directory = new ExperienceContainerDirectoryAccessor(entry);
+        using var decoded = directory.Open(source, entry);
+
+        Assert.Throws<InvalidDataException>(() => decoded.Read(new byte[logical.Length]));
+    }
+
+    [Fact]
     public void ReadRejectsLogicalLengthThatIsTooLarge()
     {
         byte[] logical = { 1, 2, 3, 4 };
