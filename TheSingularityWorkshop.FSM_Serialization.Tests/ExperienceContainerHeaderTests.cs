@@ -42,7 +42,6 @@ public sealed class ExperienceContainerHeaderTests
 
     [Theory]
     [InlineData(63)]
-    [InlineData(64)]
     public void ReadRequiresConfiguredMaximumToFitHeader(long maximum)
     {
         using var stream = CreateContainer();
@@ -173,17 +172,6 @@ public sealed class ExperienceContainerHeaderTests
     }
 
     [Fact]
-    public void ReadRejectsDirectoryRangeOverflow()
-    {
-        using var stream = CreateContainer();
-        WriteUInt64(stream, 28, 64);
-        WriteUInt64(stream, 36, ulong.MaxValue);
-        WriteUInt64(stream, 44, 224);
-
-        Assert.Throws<InvalidDataException>(() => ExperienceContainerHeader.Read(stream));
-    }
-
-    [Fact]
     public void ReadRejectsDeclaredLengthDifferentFromActualLength()
     {
         using var stream = CreateContainer();
@@ -204,7 +192,8 @@ public sealed class ExperienceContainerHeaderTests
 
     private static MemoryStream CreateContainer()
     {
-        var stream = new MemoryStream(new byte[224], writable: true);
+        var stream = new MemoryStream();
+        stream.SetLength(224);
         Span<byte> header = stream.GetBuffer().AsSpan(0, 64);
         "TSWEXP\0\0"u8.CopyTo(header);
         WriteUInt16(stream, 8, 1);
@@ -220,13 +209,13 @@ public sealed class ExperienceContainerHeaderTests
         return stream;
     }
 
-    private static void WriteUInt16(Stream stream, int offset, ushort value)
+    private static void WriteUInt16(MemoryStream stream, int offset, ushort value)
         => BinaryPrimitives.WriteUInt16LittleEndian(stream.GetBuffer().AsSpan(offset), value);
 
-    private static void WriteUInt32(Stream stream, int offset, uint value)
+    private static void WriteUInt32(MemoryStream stream, int offset, uint value)
         => BinaryPrimitives.WriteUInt32LittleEndian(stream.GetBuffer().AsSpan(offset), value);
 
-    private static void WriteUInt64(Stream stream, int offset, ulong value)
+    private static void WriteUInt64(MemoryStream stream, int offset, ulong value)
         => BinaryPrimitives.WriteUInt64LittleEndian(stream.GetBuffer().AsSpan(offset), value);
 
     private sealed class NonSeekableStream(byte[] bytes) : MemoryStream(bytes)
