@@ -285,10 +285,11 @@ public sealed class ExperienceContainerDirectoryTests
     [Fact]
     public void ReadRejectsDuplicateRepeatedSectionId()
     {
-        using var stream = CreateContainerWithUnknownSection(required: false);
-        WriteUInt32(stream, 96, ExperienceContainerDirectory.OverridesType);
-        WriteUInt32(stream, 176, ExperienceContainerDirectory.OverridesType);
-        // Both IDs are zero, which is rejected before duplicate-ID detection.
+        using var stream = CreateContainerWithRepeatedSections();
+        // The second override uses the same nonzero ID as the first. This reaches
+        // duplicate-ID validation rather than the separate zero-ID rejection.
+        stream.GetBuffer()[256 + 8] = 1;
+
         Assert.Throws<InvalidDataException>(() => ReadDirectory(stream));
     }
 
@@ -351,6 +352,41 @@ public sealed class ExperienceContainerDirectoryTests
         WriteDigest(stream, includeUnknown ? 176 : 160, new byte[8]);
         if (includeUnknown)
             WriteEntry(stream, 256, 99, required ? 1u : 0u, 80, 8);
+
+        stream.Position = 0;
+        return stream;
+    }
+
+    private static MemoryStream CreateContainerWithRepeatedSections()
+    {
+        const int count = 4;
+        const long directoryOffset = 96;
+        const long directoryLength = count * 80L;
+        const long fileLength = directoryOffset + directoryLength;
+        var stream = new MemoryStream();
+        stream.SetLength(fileLength);
+
+        Span<byte> header = stream.GetBuffer().AsSpan(0, 64);
+        "TSWEXP\\0\\0"u8.CopyTo(header);
+        WriteUInt16(stream, 8, 1);
+        WriteUInt16(stream, 10, 0);
+        WriteUInt32(stream, 12, 64);
+        WriteUInt32(stream, 16, 0);
+        WriteUInt32(stream, 20, 80);
+        WriteUInt32(stream, 24, count);
+        WriteUInt64(stream, 28, directoryOffset);
+        WriteUInt64(stream, 36, directoryLength);
+        WriteUInt64(stream, 44, fileLength);
+
+        WriteEntry(stream, 96, ExperienceContainerDirectory.ManifestType, 0, 64, 8);
+        WriteEntry(stream, 176, ExperienceContainerDirectory.OverridesType, 0, 72, 8);
+        WriteEntry(stream, 256, ExperienceContainerDirectory.OverridesType, 0, 80, 8);
+        WriteEntry(stream, 336, ExperienceContainerDirectory.IntegrityMetadataType, 0, 88, 8);
+        stream.GetBuffer()[176 + 8] = 1;
+        stream.GetBuffer()[256 + 8] = 2;
+
+        for (int entryOffset = 96; entryOffset <= 336; entryOffset += 80)
+            WriteDigest(stream, entryOffset, new byte[8]);
 
         stream.Position = 0;
         return stream;
