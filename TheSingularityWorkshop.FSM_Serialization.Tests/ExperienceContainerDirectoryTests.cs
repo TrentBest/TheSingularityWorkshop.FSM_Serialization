@@ -254,7 +254,7 @@ public sealed class ExperienceContainerDirectoryTests
     }
 
     [Fact]
-    public void ReadRejectsDuplicateSingletonManifest()
+    public void ReadRejectsDuplicateManifestDirectoryKey()
     {
         using var stream = CreateContainer();
         WriteUInt32(stream, 160, ExperienceContainerDirectory.ManifestType);
@@ -262,7 +262,7 @@ public sealed class ExperienceContainerDirectoryTests
     }
 
     [Fact]
-    public void ReadRejectsDuplicateResourceIndex()
+    public void ReadRejectsDuplicateResourceIndexDirectoryKey()
     {
         using var stream = CreateContainerWithUnknownSection(required: false);
         WriteUInt32(stream, 96, ExperienceContainerDirectory.ResourceIndexType);
@@ -283,7 +283,20 @@ public sealed class ExperienceContainerDirectoryTests
     }
 
     [Fact]
-    public void ReadRejectsDuplicateRepeatedSectionId()
+    public void ReadAcceptsDistinctNonzeroIdsForRepeatedSections()
+    {
+        using var stream = CreateContainerWithRepeatedSections();
+
+        var directory = ReadDirectory(stream);
+
+        Assert.Equal(4, directory.Entries.Count);
+        Assert.Equal(ExperienceContainerDirectory.OverridesType, directory.Entries[1].Type);
+        Assert.Equal(ExperienceContainerDirectory.OverridesType, directory.Entries[2].Type);
+        Assert.NotEqual(directory.Entries[1].Id, directory.Entries[2].Id);
+    }
+
+    [Fact]
+    public void ReadRejectsDuplicateNonzeroRepeatedSectionId()
     {
         using var stream = CreateContainerWithRepeatedSections();
         // The second override uses the same nonzero ID as the first. This reaches
