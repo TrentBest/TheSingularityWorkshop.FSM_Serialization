@@ -172,6 +172,15 @@ public sealed class ExperienceContainerHeaderTests
     }
 
     [Fact]
+    public void ReadRejectsDirectoryThatDoesNotEndAtDeclaredFileLength()
+    {
+        using var stream = CreateContainer();
+        WriteUInt64(stream, 28, 72);
+
+        Assert.Throws<InvalidDataException>(() => ExperienceContainerHeader.Read(stream));
+    }
+
+    [Fact]
     public void ReadRejectsDeclaredLengthDifferentFromActualLength()
     {
         using var stream = CreateContainer();
