@@ -1,4 +1,5 @@
 using System.Buffers.Binary;
+using System.Security.Cryptography;
 
 namespace TheSingularityWorkshop.FSM_Serialization.Tests;
 
@@ -15,6 +16,42 @@ public sealed class ExperienceContainerDirectoryTests
         Assert.Equal(2, directory.Entries.Count);
         Assert.Equal(ExperienceContainerDirectory.ManifestType, directory.Entries[0].Type);
         Assert.Equal(ExperienceContainerDirectory.IntegrityMetadataType, directory.Entries[1].Type);
+    }
+
+    [Fact]
+    public void OpenVerifiedSectionReturnsBoundedReadOnlyView()
+    {
+        using var stream = CreateContainer();
+        var directory = ReadDirectory(stream);
+        using var section = directory.OpenVerifiedSection(stream, directory.Entries[0]);
+
+        Assert.Equal(6, section.Length);
+        Assert.Equal(6, section.Read(new byte[10], 0, 10));
+        Assert.Equal(0, section.Read(new byte[1], 0, 1));
+        Assert.Throws<NotSupportedException>(() => section.Write(new byte[1], 0, 1));
+    }
+
+    [Fact]
+    public void OpenVerifiedSectionRejectsDigestMismatchBeforeReturningView()
+    {
+        using var stream = CreateContainer();
+        var directory = ReadDirectory(stream);
+        stream.GetBuffer()[64] = 0x42;
+
+        Assert.Throws<InvalidDataException>(
+            () => directory.OpenVerifiedSection(stream, directory.Entries[0]));
+    }
+
+    [Fact]
+    public void OpenVerifiedSectionRejectsEntryFromAnotherDirectory()
+    {
+        using var first = CreateContainer();
+        using var second = CreateContainer();
+        var firstDirectory = ReadDirectory(first);
+        var secondDirectory = ReadDirectory(second);
+
+        Assert.Throws<ArgumentException>(
+            () => firstDirectory.OpenVerifiedSection(first, secondDirectory.Entries[0]));
     }
 
     [Fact]
@@ -148,12 +185,17 @@ public sealed class ExperienceContainerDirectoryTests
 
         WriteEntry(stream, includeUnknown ? 96 : 80, ExperienceContainerDirectory.ManifestType, 0, 64, 6);
         WriteEntry(stream, includeUnknown ? 176 : 160, ExperienceContainerDirectory.IntegrityMetadataType, 0, 72, 8);
+        WriteDigest(stream, includeUnknown ? 96 : 80, new byte[6]);
+        WriteDigest(stream, includeUnknown ? 176 : 160, new byte[8]);
         if (includeUnknown)
             WriteEntry(stream, 256, 99, required ? 1u : 0u, 80, 8);
 
         stream.Position = 0;
         return stream;
     }
+
+    private static void WriteDigest(MemoryStream stream, int entryOffset, byte[] payload)
+        => SHA256.HashData(payload).CopyTo(stream.GetBuffer(), entryOffset + 48);
 
     private static void WriteEntry(MemoryStream stream, int offset, uint type, uint flags, ulong payloadOffset, ulong length)
     {
