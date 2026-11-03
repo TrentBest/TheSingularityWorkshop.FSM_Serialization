@@ -25,9 +25,20 @@ internal sealed class ExperienceContainerDirectory
     internal const uint IntegrityMetadataType = 6;
 
     internal IReadOnlyList<ExperienceSectionEntry> Entries { get; }
+    private readonly object _sourceGate = new();
 
     private ExperienceContainerDirectory(IReadOnlyList<ExperienceSectionEntry> entries)
         => Entries = entries;
+
+    /// <summary>Verifies a section's stored bytes before returning a bounded read-only view.</summary>
+    /// <remarks>The caller must keep the underlying source immutable for the lifetime of the returned stream.</remarks>
+    internal VerifiedExperienceSectionStream OpenVerifiedSection(Stream source, ExperienceSectionEntry entry)
+    {
+        ArgumentNullException.ThrowIfNull(entry);
+        if (!Entries.Contains(entry))
+            throw new ArgumentException("The section entry does not belong to this directory.", nameof(entry));
+        return VerifiedExperienceSectionStream.Open(source, _sourceGate, entry);
+    }
 
     internal static ExperienceContainerDirectory Read(
         Stream source,
