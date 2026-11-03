@@ -128,7 +128,7 @@ public sealed class ExperienceContainerDirectoryTests
     private static MemoryStream CreateContainerWithUnknownSection(bool required, bool includeUnknown = true)
     {
         int count = includeUnknown ? 3 : 2;
-        long directoryOffset = includeUnknown ? 88 : 80;
+        long directoryOffset = includeUnknown ? 96 : 80;
         long directoryLength = count * 80L;
         long fileLength = directoryOffset + directoryLength;
         var stream = new MemoryStream();
@@ -146,10 +146,10 @@ public sealed class ExperienceContainerDirectoryTests
         WriteUInt64(stream, 36, (ulong)directoryLength);
         WriteUInt64(stream, 44, (ulong)fileLength);
 
-        WriteEntry(stream, includeUnknown ? 88 : 80, ExperienceContainerDirectory.ManifestType, 0, 64, 6);
-        WriteEntry(stream, includeUnknown ? 168 : 160, ExperienceContainerDirectory.IntegrityMetadataType, 0, 72, 8);
+        WriteEntry(stream, includeUnknown ? 96 : 80, ExperienceContainerDirectory.ManifestType, 0, 64, 6);
+        WriteEntry(stream, includeUnknown ? 176 : 160, ExperienceContainerDirectory.IntegrityMetadataType, 0, 72, 8);
         if (includeUnknown)
-            WriteEntry(stream, 248, 99, required ? 1u : 0u, 80, 8);
+            WriteEntry(stream, 256, 99, required ? 1u : 0u, 80, 8);
 
         stream.Position = 0;
         return stream;
