@@ -48,8 +48,8 @@ internal static class ExperienceContainerWriter
         ArgumentNullException.ThrowIfNull(sections);
         if (!destination.CanWrite)
             throw new ArgumentException("The destination stream must be writable.", nameof(destination));
-        if (destination.CanSeek && destination.Position != 0)
-            throw new ArgumentException("A seekable destination must be positioned at the beginning of the container.", nameof(destination));
+        if (destination.CanSeek && (destination.Position != 0 || destination.Length != 0))
+            throw new ArgumentException("A seekable destination must be empty and positioned at the beginning of the container.", nameof(destination));
         if (maximumContainerBytes < ExperienceContainerHeader.Size)
             throw new ArgumentOutOfRangeException(nameof(maximumContainerBytes));
         if (maximumSectionBytes < 0)
@@ -64,7 +64,7 @@ internal static class ExperienceContainerWriter
         var planned = new List<PlannedSection>(sections.Count);
         for (int index = 0; index < sections.Count; index++)
         {
-            ExperienceSectionSource section = sections[index];
+            ExperienceSectionSource section = sections[index] with { Id = sections[index].Id.ToArray() };
             planned.Add(new PlannedSection(section, CalculateDigest(section), 0, index));
         }
 
@@ -135,6 +135,9 @@ internal static class ExperienceContainerWriter
                 throw new InvalidDataException("Aggregate logical section data exceeds its configured limit.");
 
             bool zeroId = section.Id.AsSpan().IndexOfAnyExcept((byte)0) < 0;
+            string directoryKey = section.Type.ToString("X8", System.Globalization.CultureInfo.InvariantCulture) + Convert.ToHexString(section.Id);
+            if (!keys.Add(directoryKey))
+                throw new InvalidDataException("The section set contains a duplicate directory key.");
             switch (section.Type)
             {
                 case ExperienceContainerDirectory.ManifestType:
@@ -154,8 +157,6 @@ internal static class ExperienceContainerWriter
                 case ExperienceContainerDirectory.OpaqueArtifactType:
                     if (zeroId)
                         throw new InvalidDataException("Repeated section types require nonzero section IDs.");
-                    if (!keys.Add(section.Type.ToString("X8", System.Globalization.CultureInfo.InvariantCulture) + Convert.ToHexString(section.Id)))
-                        throw new InvalidDataException("A repeated section type contains a duplicate section ID.");
                     break;
                 default:
                     if (section.Required)
