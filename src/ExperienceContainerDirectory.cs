@@ -55,6 +55,7 @@ internal sealed class ExperienceContainerDirectory
             throw new ArgumentOutOfRangeException(nameof(maximumAggregateLogicalBytes));
 
         long aggregateLogicalBytes = 0;
+        byte[] buffer = new byte[81920];
         foreach (ExperienceSectionEntry entry in Entries)
         {
             try
@@ -76,7 +77,6 @@ internal sealed class ExperienceContainerDirectory
                 _ => throw new InvalidDataException("The section uses an unsupported compression value.")
             };
 
-            byte[] buffer = new byte[81920];
             while (section.Read(buffer, 0, buffer.Length) != 0)
             {
                 // Drain to completion so Brotli framing, exact logical length, and trailing bytes are checked.
