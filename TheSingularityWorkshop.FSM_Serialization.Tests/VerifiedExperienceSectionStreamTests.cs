@@ -115,7 +115,8 @@ public sealed class VerifiedExperienceSectionStreamTests
 
     private static MemoryStream CreateSource()
     {
-        var source = new MemoryStream(new byte[80]);
+        var source = new MemoryStream();
+        source.SetLength(80);
         byte[] payload = { 1, 2, 3, 4, 5, 6 };
         payload.CopyTo(source.GetBuffer(), 64);
         return source;
