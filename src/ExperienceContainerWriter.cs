@@ -82,6 +82,7 @@ internal static class ExperienceContainerWriter
             withOffsets.Add(item.Ordinal, item with { Offset = cursor });
             cursor = checked(cursor + item.Source.Length);
         }
+        physical = physical.Select(item => withOffsets[item.Ordinal]).ToArray();
 
         long directoryOffset = Align8(cursor);
         long directoryLength = checked((long)sections.Count * ExperienceContainerHeader.DirectoryEntrySize);
