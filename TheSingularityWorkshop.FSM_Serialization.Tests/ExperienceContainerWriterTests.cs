@@ -114,6 +114,93 @@ public sealed class ExperienceContainerWriterTests
             new MemoryStream(), GoldenSections(), maximumSectionBytes: 2));
     }
 
+    [Fact]
+    public void WriteSupportsNonSeekableDestination()
+    {
+        using var storage = new MemoryStream();
+        using (var destination = new NonSeekableWriteStream(storage))
+            ExperienceContainerWriter.Write(destination, GoldenSections());
+
+        storage.Position = 0;
+        ExperienceContainerHeader header = ExperienceContainerHeader.Read(storage);
+        Assert.Equal(3, ExperienceContainerDirectory.Read(storage, header).Entries.Count);
+    }
+
+    [Fact]
+    public void WriteRejectsDuplicateOptionalDirectoryKeys()
+    {
+        byte[] optionalId = new byte[16];
+        optionalId[0] = 7;
+        var sections = new[]
+        {
+            Source(ExperienceContainerDirectory.ManifestType, new byte[16], new byte[] { 1 }),
+            Source(99, optionalId, new byte[] { 2 }) with { Required = false },
+            Source(99, optionalId, new byte[] { 3 }) with { Required = false },
+            Source(ExperienceContainerDirectory.IntegrityMetadataType, new byte[16], new byte[] { 4 })
+        };
+        Assert.Throws<InvalidDataException>(() => ExperienceContainerWriter.Write(new MemoryStream(), sections));
+    }
+
+    [Fact]
+    public void WriteRejectsUnknownRequiredSection()
+    {
+        var sections = GoldenSections().Append(
+            Source(99, new byte[16], new byte[] { 5 })).ToArray();
+        Assert.Throws<InvalidDataException>(() => ExperienceContainerWriter.Write(new MemoryStream(), sections));
+    }
+
+    [Fact]
+    public void WriteRejectsAggregateAndContainerLimits()
+    {
+        Assert.Throws<InvalidDataException>(() => ExperienceContainerWriter.Write(
+            new MemoryStream(), GoldenSections(), maximumAggregateLogicalBytes: 5));
+        Assert.Throws<InvalidDataException>(() => ExperienceContainerWriter.Write(
+            new MemoryStream(), GoldenSections(), maximumContainerBytes: 100));
+    }
+
+    [Fact]
+    public void WriteRejectsSourceLongerThanDeclaredLength()
+    {
+        var source = new ExperienceSectionSource(
+            ExperienceContainerDirectory.ManifestType, new byte[16], true, 1,
+            () => new MemoryStream(new byte[] { 1, 2 }, writable: false));
+        var integrity = Source(ExperienceContainerDirectory.IntegrityMetadataType, new byte[16], new byte[] { 3 });
+        Assert.Throws<InvalidDataException>(() =>
+            ExperienceContainerWriter.Write(new MemoryStream(), new[] { source, integrity }));
+    }
+
+    [Fact]
+    public void WriteRejectsSourceShorterThanDeclaredLength()
+    {
+        var source = new ExperienceSectionSource(
+            ExperienceContainerDirectory.ManifestType, new byte[16], true, 2,
+            () => new MemoryStream(new byte[] { 1 }, writable: false));
+        var integrity = Source(ExperienceContainerDirectory.IntegrityMetadataType, new byte[16], new byte[] { 3 });
+        Assert.Throws<EndOfStreamException>(() =>
+            ExperienceContainerWriter.Write(new MemoryStream(), new[] { source, integrity }));
+    }
+
+    private sealed class NonSeekableWriteStream(Stream inner) : Stream
+    {
+        public override bool CanRead => false;
+        public override bool CanSeek => false;
+        public override bool CanWrite => true;
+        public override long Length => throw new NotSupportedException();
+        public override long Position { get => throw new NotSupportedException(); set => throw new NotSupportedException(); }
+        public override void Flush() => inner.Flush();
+        public override void Write(byte[] buffer, int offset, int count) => inner.Write(buffer, offset, count);
+        public override void Write(ReadOnlySpan<byte> buffer) => inner.Write(buffer);
+        public override long Seek(long offset, SeekOrigin origin) => throw new NotSupportedException();
+        public override void SetLength(long value) => throw new NotSupportedException();
+        public override int Read(byte[] buffer, int offset, int count) => throw new NotSupportedException();
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+                inner.Flush();
+            base.Dispose(disposing);
+        }
+    }
+
     private static byte[] WriteGoldenContainer()
     {
         using var output = new MemoryStream();
