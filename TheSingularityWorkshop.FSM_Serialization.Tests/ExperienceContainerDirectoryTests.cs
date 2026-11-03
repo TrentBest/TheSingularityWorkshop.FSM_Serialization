@@ -94,7 +94,7 @@ public sealed class ExperienceContainerDirectoryTests
     public void ReadRejectsOverlappingPayloads()
     {
         using var stream = CreateContainer();
-        WriteUInt64(stream, 104, 72);
+        WriteUInt64(stream, 184, 68);
 
         Assert.Throws<InvalidDataException>(() => ReadDirectory(stream));
     }
@@ -103,7 +103,7 @@ public sealed class ExperienceContainerDirectoryTests
     public void ReadRejectsNonzeroPadding()
     {
         using var stream = CreateContainer();
-        stream.GetBuffer()[79] = 0x7f;
+        stream.GetBuffer()[70] = 0x7f;
 
         Assert.Throws<InvalidDataException>(() => ReadDirectory(stream));
     }
@@ -146,10 +146,10 @@ public sealed class ExperienceContainerDirectoryTests
         WriteUInt64(stream, 36, (ulong)directoryLength);
         WriteUInt64(stream, 44, (ulong)fileLength);
 
-        WriteEntry(stream, 64, ExperienceContainerDirectory.ManifestType, 0, 0, 8);
-        WriteEntry(stream, 144, ExperienceContainerDirectory.IntegrityMetadataType, 0, 0, 8);
+        WriteEntry(stream, includeUnknown ? 88 : 80, ExperienceContainerDirectory.ManifestType, 0, 64, 6);
+        WriteEntry(stream, includeUnknown ? 168 : 160, ExperienceContainerDirectory.IntegrityMetadataType, 0, 72, 8);
         if (includeUnknown)
-            WriteEntry(stream, 224, 99, required ? 1u : 0u, 0, 8);
+            WriteEntry(stream, 248, 99, required ? 1u : 0u, 80, 8);
 
         stream.Position = 0;
         return stream;
