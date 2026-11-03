@@ -58,7 +58,7 @@ The directory is placed after the payloads so a writer can stream section data b
 
 All integer fields are **unsigned little-endian** unless explicitly stated otherwise. All offsets and lengths are byte counts from the beginning of the file. No native struct layout, compiler packing, or platform endianness is part of the format.
 
-All section payload starts are aligned to 8-byte boundaries. Every gap between the end of the header and first payload, between payloads, and between the final payload and directory MUST consist only of zero padding bytes. Directory entries are sorted by ascending section type, then lexicographically by the 16-byte section identifier. Payloads MUST NOT overlap the header, one another, or the directory. Physical payload order MUST follow the same `(sectionType, sectionId)` order, making writer output deterministic and allowing sequential scans.
+All section payload starts are aligned to 8-byte boundaries. Every gap between the end of the header and first payload, between payloads, and between the final payload and directory MUST consist only of zero padding bytes. Directory entries are sorted by ascending section type, then lexicographically by the 16-byte section identifier. Payloads MUST NOT overlap the header, one another, or the directory. Physical payload order is separate from directory order: version 1 writers SHOULD place startup-critical sections first as specified in section 9, then order repeated payloads deterministically within each section type.
 
 ## 3. Fixed header
 
