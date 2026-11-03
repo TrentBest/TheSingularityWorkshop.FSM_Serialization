@@ -250,7 +250,7 @@ public sealed class ExperienceContainerWriterTests
         stream.SetLength(fileLength);
         byte[] bytes = stream.GetBuffer();
 
-        "TSWEXP\\0\\0"u8.CopyTo(bytes);
+        "TSWEXP\0\0"u8.CopyTo(bytes);
         BinaryPrimitives.WriteUInt16LittleEndian(bytes.AsSpan(8), 1);
         BinaryPrimitives.WriteUInt16LittleEndian(bytes.AsSpan(10), 0);
         BinaryPrimitives.WriteUInt32LittleEndian(bytes.AsSpan(12), ExperienceContainerHeader.Size);
