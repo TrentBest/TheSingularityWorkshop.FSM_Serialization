@@ -1,3 +1,4 @@
+using System.Buffers;
 using System.IO.Compression;
 
 namespace TheSingularityWorkshop.FSM_Serialization;
