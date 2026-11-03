@@ -367,7 +367,7 @@ public sealed class ExperienceContainerDirectoryTests
         stream.SetLength(fileLength);
 
         Span<byte> header = stream.GetBuffer().AsSpan(0, 64);
-        "TSWEXP\\0\\0"u8.CopyTo(header);
+        "TSWEXP\0\0"u8.CopyTo(header);
         WriteUInt16(stream, 8, 1);
         WriteUInt16(stream, 10, 0);
         WriteUInt32(stream, 12, 64);
