@@ -29,7 +29,8 @@ internal static class ExperienceContainerWriter
     private sealed record PlannedSection(
         ExperienceSectionSource Source,
         byte[] Digest,
-        long Offset);
+        long Offset,
+        int Ordinal);
 
     /// <summary>
     /// Writes a version 1 container. Sources are read twice: once to calculate their
@@ -47,6 +48,8 @@ internal static class ExperienceContainerWriter
         ArgumentNullException.ThrowIfNull(sections);
         if (!destination.CanWrite)
             throw new ArgumentException("The destination stream must be writable.", nameof(destination));
+        if (destination.CanSeek && destination.Position != 0)
+            throw new ArgumentException("A seekable destination must be positioned at the beginning of the container.", nameof(destination));
         if (maximumContainerBytes < ExperienceContainerHeader.Size)
             throw new ArgumentOutOfRangeException(nameof(maximumContainerBytes));
         if (maximumSectionBytes < 0)
@@ -59,8 +62,11 @@ internal static class ExperienceContainerWriter
         ValidateSources(sections, maximumSectionBytes, maximumAggregateLogicalBytes);
 
         var planned = new List<PlannedSection>(sections.Count);
-        foreach (ExperienceSectionSource section in sections)
-            planned.Add(new PlannedSection(section, CalculateDigest(section), 0));
+        for (int index = 0; index < sections.Count; index++)
+        {
+            ExperienceSectionSource section = sections[index];
+            planned.Add(new PlannedSection(section, CalculateDigest(section), 0, index));
+        }
 
         PlannedSection[] physical = planned
             .OrderBy(item => PhysicalOrder(item.Source.Type))
@@ -69,11 +75,11 @@ internal static class ExperienceContainerWriter
             .ToArray();
 
         long cursor = ExperienceContainerHeader.Size;
-        var withOffsets = new Dictionary<ExperienceSectionSource, PlannedSection>();
+        var withOffsets = new Dictionary<int, PlannedSection>();
         foreach (PlannedSection item in physical)
         {
             cursor = Align8(cursor);
-            withOffsets.Add(item.Source, item with { Offset = cursor });
+            withOffsets.Add(item.Ordinal, item with { Offset = cursor });
             cursor = checked(cursor + item.Source.Length);
         }
 
@@ -84,7 +90,7 @@ internal static class ExperienceContainerWriter
             throw new InvalidDataException("The completed container exceeds the configured size limit.");
 
         PlannedSection[] directory = planned
-            .Select(item => withOffsets[item.Source])
+            .Select(item => withOffsets[item.Ordinal])
             .OrderBy(item => item.Source.Type)
             .ThenBy(item => item.Source.Id, ByteArrayComparer.Instance)
             .ToArray();
