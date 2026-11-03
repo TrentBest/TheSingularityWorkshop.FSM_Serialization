@@ -157,6 +157,168 @@ public sealed class ExperienceContainerDirectoryTests
                 maximumStoredSectionBytes: 7));
     }
 
+
+    [Fact]
+    public void ReadRejectsNullSource()
+        => Assert.Throws<ArgumentNullException>(() => ExperienceContainerDirectory.Read(null!, default));
+
+    [Fact]
+    public void ReadRejectsNegativeConfiguredLimits()
+    {
+        using var stream = CreateContainer();
+        var header = ExperienceContainerHeader.Read(stream);
+        Assert.Throws<ArgumentOutOfRangeException>(() => ExperienceContainerDirectory.Read(stream, header, -1));
+        Assert.Throws<ArgumentOutOfRangeException>(() => ExperienceContainerDirectory.Read(stream, header, maximumLogicalSectionBytes: -1));
+        Assert.Throws<ArgumentOutOfRangeException>(() => ExperienceContainerDirectory.Read(stream, header, maximumAggregateLogicalBytes: -1));
+    }
+
+    [Fact]
+    public void ReadRejectsSectionAboveConfiguredLogicalLimit()
+    {
+        using var stream = CreateContainer();
+        Assert.Throws<InvalidDataException>(() => ExperienceContainerDirectory.Read(
+            stream, ExperienceContainerHeader.Read(stream), maximumLogicalSectionBytes: 5));
+    }
+
+    [Fact]
+    public void ReadRejectsAggregateLogicalLimit()
+    {
+        using var stream = CreateContainer();
+        Assert.Throws<InvalidDataException>(() => ExperienceContainerDirectory.Read(
+            stream, ExperienceContainerHeader.Read(stream), maximumAggregateLogicalBytes: 13));
+    }
+
+    [Fact]
+    public void ReadRejectsSectionOffsetAboveSupportedRange()
+    {
+        using var stream = CreateContainer();
+        WriteUInt64(stream, 104, ulong.MaxValue);
+        Assert.Throws<InvalidDataException>(() => ReadDirectory(stream));
+    }
+
+    [Fact]
+    public void ReadRejectsSectionStoredLengthAboveSupportedRange()
+    {
+        using var stream = CreateContainer();
+        WriteUInt64(stream, 112, ulong.MaxValue);
+        Assert.Throws<InvalidDataException>(() => ReadDirectory(stream));
+    }
+
+    [Fact]
+    public void ReadRejectsSectionLogicalLengthAboveSupportedRange()
+    {
+        using var stream = CreateContainer();
+        WriteUInt64(stream, 120, ulong.MaxValue);
+        Assert.Throws<InvalidDataException>(() => ReadDirectory(stream));
+    }
+
+    [Fact]
+    public void ReadRejectsUnsupportedCompressionValue()
+    {
+        using var stream = CreateContainer();
+        WriteUInt32(stream, 84, 4);
+        Assert.Throws<InvalidDataException>(() => ReadDirectory(stream));
+    }
+
+    [Fact]
+    public void ReadRejectsMisalignedPayloadOffset()
+    {
+        using var stream = CreateContainer();
+        WriteUInt64(stream, 104, 65);
+        Assert.Throws<InvalidDataException>(() => ReadDirectory(stream));
+    }
+
+    [Fact]
+    public void ReadRejectsPayloadOverlappingHeader()
+    {
+        using var stream = CreateContainer();
+        WriteUInt64(stream, 104, 56);
+        Assert.Throws<InvalidDataException>(() => ReadDirectory(stream));
+    }
+
+    [Fact]
+    public void ReadRejectsPayloadOverlappingDirectory()
+    {
+        using var stream = CreateContainer();
+        WriteUInt64(stream, 104, 80);
+        Assert.Throws<InvalidDataException>(() => ReadDirectory(stream));
+    }
+
+    [Fact]
+    public void ReadRejectsMissingIntegrityMetadata()
+    {
+        using var stream = CreateContainer();
+        WriteUInt32(stream, 160, 99);
+        WriteUInt32(stream, 164, 0);
+        Assert.Throws<InvalidDataException>(() => ReadDirectory(stream));
+    }
+
+    [Fact]
+    public void ReadRejectsDuplicateSingletonManifest()
+    {
+        using var stream = CreateContainer();
+        WriteUInt32(stream, 160, ExperienceContainerDirectory.ManifestType);
+        Assert.Throws<InvalidDataException>(() => ReadDirectory(stream));
+    }
+
+    [Fact]
+    public void ReadRejectsDuplicateResourceIndex()
+    {
+        using var stream = CreateContainerWithUnknownSection(required: false);
+        WriteUInt32(stream, 96, ExperienceContainerDirectory.ResourceIndexType);
+        WriteUInt32(stream, 176, ExperienceContainerDirectory.ResourceIndexType);
+        WriteUInt32(stream, 256, ExperienceContainerDirectory.IntegrityMetadataType);
+        // Keep canonical ordering and make the third entry's payload the integrity record.
+        WriteUInt32(stream, 96 + 4, 0);
+        WriteUInt32(stream, 176 + 4, 0);
+        Assert.Throws<InvalidDataException>(() => ReadDirectory(stream));
+    }
+
+    [Fact]
+    public void ReadRejectsZeroIdForRepeatedSectionType()
+    {
+        using var stream = CreateContainerWithUnknownSection(required: false);
+        WriteUInt32(stream, 256, ExperienceContainerDirectory.OverridesType);
+        Assert.Throws<InvalidDataException>(() => ReadDirectory(stream));
+    }
+
+    [Fact]
+    public void ReadRejectsDuplicateRepeatedSectionId()
+    {
+        using var stream = CreateContainerWithUnknownSection(required: false);
+        WriteUInt32(stream, 96, ExperienceContainerDirectory.OverridesType);
+        WriteUInt32(stream, 176, ExperienceContainerDirectory.OverridesType);
+        // Both IDs are zero, which is rejected before duplicate-ID detection.
+        Assert.Throws<InvalidDataException>(() => ReadDirectory(stream));
+    }
+
+    [Fact]
+    public void ReadAcceptsCompressedNonIntegritySectionWithDifferentStoredAndLogicalLengths()
+    {
+        using var stream = CreateContainerWithUnknownSection(required: false);
+        // Unknown optional sections may declare Brotli data and a different logical size.
+        WriteUInt32(stream, 260, 2);
+        WriteUInt64(stream, 288, 4);
+        Assert.Equal(3, ReadDirectory(stream).Entries.Count);
+    }
+
+    [Fact]
+    public void OpenVerifiedSectionRejectsUnreadableSource()
+    {
+        using var stream = CreateContainer();
+        var directory = ReadDirectory(stream);
+        stream.Dispose();
+        Assert.Throws<ArgumentException>(() => directory.OpenVerifiedSection(stream, directory.Entries[0]));
+    }
+
+    [Fact]
+    public void OpenVerifiedSectionRejectsNullEntry()
+    {
+        using var stream = CreateContainer();
+        var directory = ReadDirectory(stream);
+        Assert.Throws<ArgumentNullException>(() => directory.OpenVerifiedSection(stream, null!));
+    }
+
     private static ExperienceContainerDirectory ReadDirectory(Stream stream)
         => ExperienceContainerDirectory.Read(stream, ExperienceContainerHeader.Read(stream));
 
