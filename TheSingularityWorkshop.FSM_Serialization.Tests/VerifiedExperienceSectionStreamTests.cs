@@ -51,7 +51,7 @@ public sealed class VerifiedExperienceSectionStreamTests
         Assert.Equal(2, section.Read(new byte[2], 0, 2));
         Assert.Equal(2, section.Position);
         Assert.Equal(4, section.Seek(-2, SeekOrigin.End));
-        Assert.Equal(4, section.Seek(-2, SeekOrigin.Current));
+        Assert.Equal(2, section.Seek(-2, SeekOrigin.Current));
         Assert.Equal(1, section.Seek(1, SeekOrigin.Begin));
         Assert.Equal(5, section.Read(new byte[10]));
         Assert.Equal(6, section.Position);
