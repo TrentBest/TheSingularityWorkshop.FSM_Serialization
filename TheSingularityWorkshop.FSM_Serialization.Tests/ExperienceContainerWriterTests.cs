@@ -1,4 +1,6 @@
 using System.Buffers.Binary;
+using System.IO.Compression;
+using System.Security.Cryptography;
 
 namespace TheSingularityWorkshop.FSM_Serialization.Tests;
 
@@ -178,6 +180,122 @@ public sealed class ExperienceContainerWriterTests
         var integrity = Source(ExperienceContainerDirectory.IntegrityMetadataType, new byte[16], new byte[] { 3 });
         Assert.Throws<EndOfStreamException>(() =>
             ExperienceContainerWriter.Write(new MemoryStream(), new[] { source, integrity }));
+    }
+
+    [Fact]
+    public void VerifyAllSectionPayloadsVerifiesEveryUncompressedSection()
+    {
+        using var source = new MemoryStream(WriteGoldenContainer(), writable: false);
+        ExperienceContainerHeader header = ExperienceContainerHeader.Read(source);
+        ExperienceContainerDirectory directory = ExperienceContainerDirectory.Read(source, header);
+
+        directory.VerifyAllSectionPayloads(source);
+    }
+
+    [Fact]
+    public void VerifyAllSectionPayloadsRejectsMutatedSectionBytes()
+    {
+        byte[] bytes = WriteGoldenContainer();
+        bytes[64] ^= 0x01;
+        using var source = new MemoryStream(bytes, writable: false);
+        ExperienceContainerHeader header = ExperienceContainerHeader.Read(source);
+        ExperienceContainerDirectory directory = ExperienceContainerDirectory.Read(source, header);
+
+        Assert.Throws<InvalidDataException>(() => directory.VerifyAllSectionPayloads(source));
+    }
+
+    [Fact]
+    public void VerifyAllSectionPayloadsEnforcesAggregateLogicalLimit()
+    {
+        using var source = new MemoryStream(WriteGoldenContainer(), writable: false);
+        ExperienceContainerHeader header = ExperienceContainerHeader.Read(source);
+        ExperienceContainerDirectory directory = ExperienceContainerDirectory.Read(source, header);
+
+        Assert.Throws<InvalidDataException>(() => directory.VerifyAllSectionPayloads(source, 5));
+    }
+
+    [Fact]
+    public void VerifyAllSectionPayloadsFullyDecodesBrotliSections()
+    {
+        using var source = CreateCompressedContainer(declaredLogicalLength: 1);
+        ExperienceContainerHeader header = ExperienceContainerHeader.Read(source);
+        ExperienceContainerDirectory directory = ExperienceContainerDirectory.Read(source, header);
+
+        directory.VerifyAllSectionPayloads(source);
+    }
+
+    [Fact]
+    public void VerifyAllSectionPayloadsRejectsBrotliLogicalLengthMismatch()
+    {
+        using var source = CreateCompressedContainer(declaredLogicalLength: 2);
+        ExperienceContainerHeader header = ExperienceContainerHeader.Read(source);
+        ExperienceContainerDirectory directory = ExperienceContainerDirectory.Read(source, header);
+
+        Assert.Throws<InvalidDataException>(() => directory.VerifyAllSectionPayloads(source));
+    }
+
+    private static MemoryStream CreateCompressedContainer(long declaredLogicalLength)
+    {
+        byte[] logical = { 0x4F };
+        byte[] compressed = new byte[BrotliEncoder.GetMaxCompressedLength(logical.Length)];
+        if (!BrotliEncoder.TryCompress(logical, compressed, out int compressedLength))
+            throw new InvalidOperationException("Could not create the compressed test fixture.");
+        Array.Resize(ref compressed, compressedLength);
+
+        const int entryCount = 3;
+        const int directoryLength = entryCount * ExperienceContainerHeader.DirectoryEntrySize;
+        long directoryOffset = (80L + compressed.Length + 7) & ~7L;
+        long fileLength = directoryOffset + directoryLength;
+        var stream = new MemoryStream();
+        stream.SetLength(fileLength);
+        byte[] bytes = stream.GetBuffer();
+
+        "TSWEXP\\0\\0"u8.CopyTo(bytes);
+        BinaryPrimitives.WriteUInt16LittleEndian(bytes.AsSpan(8), 1);
+        BinaryPrimitives.WriteUInt16LittleEndian(bytes.AsSpan(10), 0);
+        BinaryPrimitives.WriteUInt32LittleEndian(bytes.AsSpan(12), ExperienceContainerHeader.Size);
+        BinaryPrimitives.WriteUInt32LittleEndian(bytes.AsSpan(20), ExperienceContainerHeader.DirectoryEntrySize);
+        BinaryPrimitives.WriteUInt32LittleEndian(bytes.AsSpan(24), entryCount);
+        BinaryPrimitives.WriteUInt64LittleEndian(bytes.AsSpan(28), (ulong)directoryOffset);
+        BinaryPrimitives.WriteUInt64LittleEndian(bytes.AsSpan(36), directoryLength);
+        BinaryPrimitives.WriteUInt64LittleEndian(bytes.AsSpan(44), (ulong)fileLength);
+
+        bytes[64] = 0x4D;
+        bytes[65] = 0x46;
+        bytes[72] = 0x49;
+        bytes[73] = 0x4E;
+        bytes[74] = 0x54;
+        compressed.CopyTo(bytes, 80);
+
+        WriteFixtureEntry(bytes, (int)directoryOffset, ExperienceContainerDirectory.ManifestType,
+            1, 0, 64, 2, 2, bytes.AsSpan(64, 2));
+        WriteFixtureEntry(bytes, (int)directoryOffset + 80, ExperienceContainerDirectory.OverridesType,
+            3, 1, 80, compressed.Length, declaredLogicalLength, compressed);
+        WriteFixtureEntry(bytes, (int)directoryOffset + 160, ExperienceContainerDirectory.IntegrityMetadataType,
+            1, 0, 72, 3, 3, bytes.AsSpan(72, 3));
+
+        stream.Position = 0;
+        return stream;
+    }
+
+    private static void WriteFixtureEntry(
+        byte[] destination,
+        int offset,
+        uint type,
+        uint flags,
+        byte idByte,
+        ulong payloadOffset,
+        long storedLength,
+        long logicalLength,
+        ReadOnlySpan<byte> payload)
+    {
+        BinaryPrimitives.WriteUInt32LittleEndian(destination.AsSpan(offset), type);
+        BinaryPrimitives.WriteUInt32LittleEndian(destination.AsSpan(offset + 4), flags);
+        destination[offset + 8] = (byte)idByte;
+        BinaryPrimitives.WriteUInt64LittleEndian(destination.AsSpan(offset + 24), payloadOffset);
+        BinaryPrimitives.WriteUInt64LittleEndian(destination.AsSpan(offset + 32), (ulong)storedLength);
+        BinaryPrimitives.WriteUInt64LittleEndian(destination.AsSpan(offset + 40), (ulong)logicalLength);
+        SHA256.HashData(payload).CopyTo(destination, offset + 48);
     }
 
     private sealed class NonSeekableWriteStream(Stream inner) : Stream
