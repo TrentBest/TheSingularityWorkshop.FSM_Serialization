@@ -286,3 +286,8 @@ Until those decisions are reviewed, this document is a proposal, not a frozen pu
 ---
 
 **Publication and release:** this work is documentation/design only. It does not authorize package version changes, NuGet publication, release, deployment, merge, or changes to `master`.
+
+
+### Signature transcript clarification (required for review)
+
+The IntegrityMetadata section is excluded from the generic section-digest tuple to avoid a circular signature. That does **not** mean its security-relevant descriptor fields may be mutable without detection. Under proposed coverage profile 1, the canonical transcript MUST additionally include the IntegrityMetadata schema version, signature profile identifier, signature algorithm identifier, publisher/key identifier, and any algorithm parameters that affect verification. Only the signature value itself is excluded. The exact canonical encoding of these fields must be specified and covered by golden signing vectors before the profile is implemented. A parser must reject ambiguous or duplicate encodings of these fields.
