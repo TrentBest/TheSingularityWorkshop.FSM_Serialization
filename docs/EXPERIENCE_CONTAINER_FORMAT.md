@@ -54,11 +54,11 @@ A version 1 file has this physical layout:
 | End of file                   |
 ```
 
-The directory is placed after the payloads so a writer can stream section data before emitting the final directory. A reader locates it from the fixed header. The header is always at offset zero.
+The directory is placed after the payloads so a writer can stream section data before emitting the final directory. A reader locates it from the fixed header. The header is always at offset zero. The directory offset MUST be 8-byte aligned, and `directoryOffset + directoryLength` MUST equal the declared file length; trailing bytes are forbidden. Every payload range MUST end at or before the directory offset.
 
 All integer fields are **unsigned little-endian** unless explicitly stated otherwise. All offsets and lengths are byte counts from the beginning of the file. No native struct layout, compiler packing, or platform endianness is part of the format.
 
-All section payload starts are aligned to 8-byte boundaries. Padding bytes MUST be zero. Directory entries are sorted by ascending section type, then lexicographically by the 16-byte section identifier. Payloads MUST NOT overlap the header, one another, or the directory.
+All section payload starts are aligned to 8-byte boundaries. Every gap between the end of the header and first payload, between payloads, and between the final payload and directory MUST consist only of zero padding bytes. Directory entries are sorted by ascending section type, then lexicographically by the 16-byte section identifier. Payloads MUST NOT overlap the header, one another, or the directory. Physical payload order MUST follow the same `(sectionType, sectionId)` order, making writer output deterministic and allowing sequential scans.
 
 ## 3. Fixed header
 
@@ -98,7 +98,7 @@ Each directory entry is exactly 80 bytes:
 
 The directory is a fixed-size array; its byte length MUST equal `entryCount × 80`. Checked multiplication and checked addition are mandatory before any range is used.
 
-A section's identity is the pair `(sectionType, sectionId)`. Duplicate pairs are invalid. A section ID is 16 opaque bytes; the all-zero ID is reserved for singleton sections. Repeated sections (for example, multiple resource payloads) use distinct nonzero IDs.
+A section's identity is the pair `(sectionType, sectionId)`. Duplicate pairs are invalid. A section ID is 16 opaque bytes. Every singleton section type MUST use the all-zero ID; every repeated section type MUST use a distinct nonzero ID. Version 1 readers MUST enforce the registry cardinality: exactly one `ExperienceManifest`, exactly one `IntegrityMetadata`, at most one `ResourceIndex`, and zero or more of each repeated type. A file with missing or duplicate singleton sections is invalid, even if the IDs differ.
 
 ### 4.1 Flags
 
@@ -141,11 +141,14 @@ A hash proves only that the bytes match the directory's claimed digest. It does 
 
 The IntegrityMetadata payload must declare:
 - integrity metadata schema version;
-- digest algorithm identifiers;
-- signature algorithm identifier, or an explicit unsigned state;
+- an explicit signed or unsigned state;
+- signature coverage profile identifier;
+- signature format and signature algorithm identifier when signed;
 - publisher/key identifier when signed;
-- signature bytes and signature format when signed;
-- the signature coverage profile identifier.
+- all algorithm parameters that affect verification;
+- signature bytes when signed.
+
+Version 1 directory entries always use SHA-256 for their 32-byte stored-payload digest. This is fixed by the directory layout and is not algorithm-agile. IntegrityMetadata MUST NOT imply that it can select a different directory digest algorithm. Any future digest agility requires a new container format version or a directory-entry format that identifies the digest algorithm.
 
 ### 6.1 Proposed signature coverage profile 1
 
@@ -154,29 +157,31 @@ The signature MUST bind the complete structural interpretation of the file, not 
 1. The exact 64-byte header.
 2. The exact directory bytes, with the IntegrityMetadata entry's SHA-256 field replaced by 32 zero bytes.
 3. For every non-integrity section, the tuple of section type, flags, ID, stored length, logical length, and SHA-256 digest in directory order.
+4. The canonical IntegrityMetadata security fields: schema version, signed/unsigned state, signature coverage profile, signature format, signature algorithm, publisher/key identifier, and all verification-affecting algorithm parameters. These fields MUST use a canonical, length-delimited encoding with fixed field identifiers in ascending order; duplicate fields, unknown critical fields, alternate encodings of the same value, and non-canonical encodings are invalid. The signature value itself is the only excluded field.
 
-The signature bytes themselves are excluded to avoid a circular digest. The IntegrityMetadata section's payload is excluded from the transcript, but the directory entry still binds its type, flags, ID, offset, and lengths. The signature envelope declares the profile and algorithm; unsupported profiles/algorithms are reported as unverifiable, never silently treated as valid.
+The IntegrityMetadata section's payload is excluded from the raw transcript to avoid circularity, but its directory entry still binds its type, flags, ID, offset, and lengths. The canonical security-field encoding is appended as the final transcript component. An unsigned record has an explicit unsigned state and no signature-only fields. Unsupported profiles/algorithms are reported as unverifiable, never silently treated as valid.
 
-This is a proposal requiring cryptographic review before implementation. The trust store, key rotation, revocation, timestamping, and publisher identity policy are host/repository concerns, not container parser concerns.
+This remains a proposal requiring cryptographic review and golden signing vectors before implementation. No signed container may be represented as verified until the exact canonical field IDs, byte encoding, and verification test vectors are frozen. The trust store, key rotation, revocation, timestamping, and publisher identity policy are host/repository concerns, not container parser concerns.
 
 ## 7. Bounds and malformed-input behavior
 
 The parser treats every file as untrusted input. Version 1 readers MUST:
 
-- verify the actual file length against the declared length;
+- verify the actual file length against the declared length and require the directory to terminate exactly at EOF;
+- require an 8-byte-aligned directory offset and validate all zero-padding gaps;
 - reject files shorter than the fixed header;
 - validate magic, version, fixed header size, entry size, reserved bytes, and flags;
 - use checked arithmetic for all offset, count, multiplication, and end calculations;
 - validate the directory range before reading entries;
 - enforce configured maximum file size, section count, stored section size, logical section size, and aggregate decompressed size;
 - reject zero-length or out-of-range section IDs where prohibited by section semantics;
-- reject duplicate `(type, ID)` pairs;
-- reject overlapping payload ranges and payload/directory/header overlap;
+- reject duplicate `(type, ID)` pairs and enforce the section registry's exact singleton cardinalities and zero-ID rule;
+- reject overlapping payload ranges and payload/directory/header overlap; every payload MUST end at or before the directory offset;
 - reject misaligned payload offsets and nonzero padding;
 - reject unsupported compression identifiers;
-- verify section hashes before exposing payload bytes to a domain decoder;
+- verify a selected section's hash before exposing its payload bytes to a domain decoder;
 - reject malformed or truncated compressed data, output-length mismatch, and trailing compressed bytes;
-- reject unknown required sections and skip unknown optional sections only after validating their bounds and stored-byte hash;
+- reject unknown required sections; unknown optional sections may be skipped after structural range validation without reading or hashing their payload;
 - avoid path extraction based on untrusted names; resource paths, if any, are logical identifiers resolved by the host rather than direct filesystem paths.
 
 Proposed conservative default reader limits (hosts may configure stricter limits; raising them requires an explicit policy decision):
@@ -192,26 +197,30 @@ Proposed conservative default reader limits (hosts may configure stricter limits
 
 These are safety policy defaults, not claims that the binary envelope itself can represent no larger values. A reader MUST reject a file exceeding its configured limits before allocating based on its untrusted declarations.
 
-A failed parse MUST NOT expose a partially trusted container object. The reader may expose validated immutable section descriptors only after the header and complete directory have passed structural validation. Payload access remains separately verified.
+A failed parse MUST NOT expose a partially trusted container object. The reader may expose validated immutable section descriptors only after the header, complete directory, cardinalities, and all payload ranges/padding have passed structural validation. Payload access remains separately verified.
+
+Readers MUST distinguish three states: (1) **structurally valid** — header, directory, cardinalities, ranges, and padding validated; (2) **section verified** — the selected section's stored-byte digest validated before exposure; and (3) **container verified** — every section digest and, when present, the publisher signature validated. A manifest-only preview performs states 1 and 2 for the manifest and MUST NOT read unrelated payloads. It MUST NOT label the entire container verified. Full-container verification is an explicit operation and may read every stored payload.
 
 ## 8. Lazy inspection and access model
 
 The reader should support the following staged workflow:
 
 1. Read and validate the fixed header.
-2. Read and validate the directory.
+2. Read and validate the directory, cardinalities, ranges, and padding.
 3. Locate the single manifest section.
 4. Verify that section's stored-byte hash.
-5. Decompress only the manifest if necessary and pass it to the manifest codec.
-6. Leave all unrelated resource and opaque artifact payloads unopened.
+5. Decompress only the manifest if it is compressed and pass it to the manifest codec.
+6. Leave all unrelated resource and opaque artifact payloads unopened and unhashed.
 7. On demand, open a section through a bounded slice/stream that cannot read outside its declared stored range.
-8. Verify the section hash before exposing bytes to its domain decoder.
+8. Verify the selected section's hash before exposing bytes to its domain decoder.
+
+The default writer SHOULD leave the manifest, overrides, resource index, and integrity metadata uncompressed. Compression is opt-in per section and SHOULD be used only for larger resource/artifact sections when measured size savings justify decompression cost. The writer SHOULD retain uncompressed bytes when compression does not beat a documented minimum savings threshold. Hosts and repositories may choose different policies based on measured transfer, storage, and startup costs; the container format does not mandate compression.
 
 Preview, indexing, download, and installation MUST NOT execute MicroBundles, opaque artifacts, scripts, native code, or other payloads. Opening a container is not permission to activate it.
 
 ## 9. Deterministic writing
 
-For identical logical input, a deterministic writer should produce identical bytes when all inputs, section IDs, compression settings, and metadata are identical.
+For identical logical input, a deterministic writer should produce identical bytes when all inputs, section IDs, compression settings, and metadata are identical. To optimize common preview and startup paths, the writer SHOULD place the manifest first, followed by integrity metadata, MicroBundle overrides, resource index, resource payloads, and opaque artifacts. The directory remains independently sorted by `(sectionType, sectionId)` as specified; directory order and physical payload order need not be coupled if the writer records each physical offset accurately.
 
 To make that possible:
 - sort directory entries by the specified order;
