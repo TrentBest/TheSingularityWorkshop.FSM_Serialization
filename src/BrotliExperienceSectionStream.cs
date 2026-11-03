@@ -1,4 +1,3 @@
-using System.Buffers;
 using System.IO.Compression;
 
 namespace TheSingularityWorkshop.FSM_Serialization;
@@ -12,7 +11,7 @@ internal sealed class BrotliExperienceSectionStream : Stream
 {
     private const int BufferSize = 81920;
     private readonly VerifiedExperienceSectionStream _stored;
-    private readonly BrotliDecoder _decoder = new();
+    private BrotliDecoder _decoder = new();
     private readonly long _logicalLength;
     private readonly byte[] _input = new byte[BufferSize];
     private int _inputOffset;
