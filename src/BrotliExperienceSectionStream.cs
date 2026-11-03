@@ -109,7 +109,7 @@ internal sealed class BrotliExperienceSectionStream : Stream
 
             if (status == OperationStatus.DestinationTooSmall)
             {
-                if (totalWritten > 0)
+                if (totalWritten > 0 && _logicalPosition < _logicalLength)
                     return totalWritten;
                 continue;
             }
@@ -135,7 +135,7 @@ internal sealed class BrotliExperienceSectionStream : Stream
                 throw new InvalidDataException("The Brotli section ended before the compressed stream completed.");
             _inputCount += read;
 
-            if (totalWritten > 0 && output.IsEmpty)
+            if (totalWritten > 0 && output.IsEmpty && _logicalPosition < _logicalLength)
                 return totalWritten;
         }
     }
