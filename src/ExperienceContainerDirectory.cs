@@ -40,6 +40,30 @@ internal sealed class ExperienceContainerDirectory
         return VerifiedExperienceSectionStream.Open(source, _sourceGate, entry);
     }
 
+    /// <summary>Verifies stored bytes, then returns a bounded incremental Brotli decoder for a compressed section.</summary>
+    internal BrotliExperienceSectionStream OpenBrotliSection(
+        Stream source,
+        ExperienceSectionEntry entry,
+        long maximumLogicalBytes = 512L * 1024 * 1024)
+    {
+        ArgumentNullException.ThrowIfNull(entry);
+        if (!Entries.Contains(entry))
+            throw new ArgumentException("The section entry does not belong to this directory.", nameof(entry));
+        if (entry.Compression != 1)
+            throw new InvalidDataException("The section is not Brotli-compressed.");
+
+        VerifiedExperienceSectionStream verified = OpenVerifiedSection(source, entry);
+        try
+        {
+            return BrotliExperienceSectionStream.Open(verified, entry.LogicalLength, maximumLogicalBytes);
+        }
+        catch
+        {
+            verified.Dispose();
+            throw;
+        }
+    }
+
     internal static ExperienceContainerDirectory Read(
         Stream source,
         ExperienceContainerHeader header,
