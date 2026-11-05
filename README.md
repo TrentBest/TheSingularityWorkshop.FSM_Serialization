@@ -13,6 +13,8 @@
 [![NuGet Downloads](https://img.shields.io/nuget/dt/TheSingularityWorkshop.FSM_Serialization.svg)](https://www.nuget.org/packages/TheSingularityWorkshop.FSM_Serialization/)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE.txt)
 
+[![Sith Policy](assets/sith-policy.svg)](https://github.com/TrentBest/TheSingularityWorkshop.FSM_Serialization/actions/workflows/sith-policy.yml)
+
 ![FSM Serialization — The Binary Boundary](docs/images/fsm-serialization-01-boundary.jpg)
 
 **A small, explicit binary representation boundary for The Singularity Workshop FSM ecosystem.**
@@ -24,7 +26,6 @@ It deliberately does **not** attempt to become a general-purpose object graph se
 > **The type that owns the meaning should own the representation rules. The serialization package should provide the boundary, not invent the meaning.**
 
 ---
-
 
 This README follows the Workshop's shared [Documentation Standard](https://github.com/TrentBest/TheSingularityWorkshop.FSM_COS/blob/master/DOCUMENTATION_STANDARD.md), while keeping this repository's own purpose and implementation authoritative.
 
@@ -769,7 +770,6 @@ These are deliberate trade-offs rather than missing features.
 
 ---
 
-
 # Performance
 
 The published **0.1.0-alpha.2** package was benchmarked through the companion **FSM_Serialization_Benchmarks** project using BenchmarkDotNet 0.15.2 on .NET 8.0.31, running on an Intel Core i5-10400F (6 physical / 12 logical cores) with RyuJIT AVX2. The benchmark suite exercised sizes of **16, 1,024, 10,000, and 100,000 bytes**.
@@ -1103,7 +1103,6 @@ Everything else should have to earn its way into a higher-level layer.
   <em>The Singularity Workshop — Tools for the curious, the bold, and the systemically inclined.</em><br>
   <strong>Because state shouldn't be a mess.</strong>
 </p>
-
 
 ---
 
