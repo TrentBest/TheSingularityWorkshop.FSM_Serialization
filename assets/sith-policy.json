@@ -1,0 +1,23 @@
+{
+  "repository": "TrentBest/TheSingularityWorkshop.FSM_Serialization",
+  "policy": "exactly-master-and-development",
+  "required_branches": [
+    "development",
+    "master"
+  ],
+  "actual_branches": [
+    "chore/standardize-ci-fsm-serialization",
+    "development",
+    "docs/benchmarking",
+    "docs/readme-standard",
+    "hardening/manual-nuget-publication",
+    "master",
+    "work/experience-container-format-spec",
+    "work/experience-container-reader-prototype"
+  ],
+  "branch_count": 8,
+  "status": "NON-COMPLIANT",
+  "evaluated_at": "2026-11-05T04:36:06Z",
+  "workflow_run": "https://github.com/TrentBest/TheSingularityWorkshop.FSM_Serialization/actions/runs/41968805262",
+  "triggering_commit": "0f617d4e45a4299b5c4c515165340bac5d38be55"
+}
