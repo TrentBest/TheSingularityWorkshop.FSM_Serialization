@@ -9,6 +9,7 @@
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE.txt)
 
 
+[![Sith Policy](assets/sith-policy.svg)](https://github.com/TrentBest/TheSingularityWorkshop.FSM_Serialization/actions/workflows/sith-policy.yml)
 > **A small, explicit binary representation boundary for Workshop-owned state.**
 
 The type that owns meaning should own its representation rules. This package provides byte-oriented contracts and stream adapters without turning into a general-purpose object-graph serializer or persistence framework.
