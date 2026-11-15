@@ -46,7 +46,7 @@ This example writes a 32-bit integer to a memory stream and reads it back. It de
 
 ### 1. Create a project in Visual Studio
 
-Choose **Create a new project → Console App**, select C#, and target **.NET 8**.
+Choose **Create a new project → Console App**, select C#, and target **.NET 10**.
 
 ### 2. Open the Developer Terminal
 
@@ -165,7 +165,7 @@ It deliberately does **not** attempt to become a general-purpose object graph se
 |---|---|
 | Package | **TheSingularityWorkshop.FSM_Serialization** |
 | Candidate version | **1.0.1** (documentation and package-content update; not yet published) |
-| Target framework | .NET 8 |
+| Target framework | .NET 10 |
 | Language | C# |
 | License | MIT |
 | Repository | [GitHub](https://github.com/TrentBest/TheSingularityWorkshop.FSM_Serialization) |
@@ -276,9 +276,9 @@ The package is available from [NuGet.org](https://www.nuget.org/packages/TheSing
 
 ## Requirements
 
-The current package targets **.NET 8**.
+The current package targets **.NET 10**.
 
-The test project also targets .NET 8.
+The test project also targets .NET 10.
 
 The package intentionally has no dependency on an application host, database, filesystem, browser runtime, Unity runtime, GUI framework, or other platform-specific execution environment.
 
@@ -927,7 +927,7 @@ The current suite verifies:
 - flush delegation;
 - fixed-size fields completed across multiple short reads.
 
-The test project targets .NET 8 and references the library project directly.
+The test project targets .NET 10 and references the library project directly.
 
 The repository verification workflow collects Cobertura coverage and uploads the report to Codecov.
 
