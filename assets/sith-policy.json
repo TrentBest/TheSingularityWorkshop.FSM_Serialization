@@ -17,7 +17,7 @@
   ],
   "branch_count": 8,
   "status": "NON-COMPLIANT",
-  "evaluated_at": "2026-11-17T13:19:10Z",
-  "workflow_run": "https://github.com/TrentBest/TheSingularityWorkshop.FSM_Serialization/actions/runs/44091479715",
-  "triggering_commit": "7e492b27163924c494f9eca0a31cfdb9185eaa24"
+  "evaluated_at": "2026-11-18T13:00:06Z",
+  "workflow_run": "https://github.com/TrentBest/TheSingularityWorkshop.FSM_Serialization/actions/runs/44309242415",
+  "triggering_commit": "44ffc5f6a0e19d491ea7e66aa63ba78cff379b6c"
 }
