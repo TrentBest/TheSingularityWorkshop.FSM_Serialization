@@ -26,10 +26,10 @@ The format is intended to support bounded inspection, lazy section access, deter
 | Experience identity, manifest fields, compatibility meaning, MicroBundle configuration defaults/schema/validation/override semantics | Experience and MicroBundle domain owners; MicroBundleDomain owns bundle parameter contracts |
 | Immutable artifact identity, retrieval, storage, and repository verification | MicroBundleRepository |
 | Dependency resolution, effective configuration, composition, and RuntimeAssembly creation | FSM_COS |
-| Runtime execution, lifecycle, cancellation, and cleanup | FSM_Foundry |
+| Runtime execution, lifecycle, cancellation, and cleanup | FSM_Execution |
 | Install/open/inspect UX, publisher status display, consent, capability policy, and presentation | AnyApp host and its Internal Module |
 
-FSM_Serialization owns the envelope, not the meaning of section payloads. It must not reference Experience, MicroBundleDomain, FSM_COS, or Foundry domain types to parse the generic container.
+FSM_Serialization owns the envelope, not the meaning of section payloads. It must not reference Experience, MicroBundleDomain, FSM_COS, or FSM_Execution domain types to parse the generic container.
 
 The container layer may expose opaque section descriptors and bounded byte/stream access. Domain-specific codecs interpret payload bytes above it.
 
@@ -290,7 +290,7 @@ Until those decisions are reviewed, this document is a proposal, not a frozen pu
 - [MicroBundleRepository #22 — immutable artifact retrieval](https://github.com/TrentBest/TheSingularityWorkshop.MicroBundleRepository/issues/22)
 - [MicroBundleRepository #24 — deterministic immutable dependency resolution](https://github.com/TrentBest/TheSingularityWorkshop.MicroBundleRepository/issues/24)
 - [FSM_COS #51 — immutable dependency pins](https://github.com/TrentBest/TheSingularityWorkshop.FSM_COS/issues/51)
-- [FSM_Foundry #23 — RuntimeAssembly execution contract](https://github.com/TrentBest/TheSingularityWorkshop.FSM_Foundry/issues/23)
+- [FSM_Execution #23 — RuntimeAssembly execution contract](https://github.com/TrentBest/TheSingularityWorkshop.FSM_Execution/issues/23)
 
 
 <p align="center">
